@@ -18,6 +18,18 @@ export const getUsers = query({
   },
 });
 
+export const getWorkplaces = query({
+  args: {},
+  handler: async (ctx) => {
+    const workplaces = await ctx.db.query("workplaces").collect();
+
+    return workplaces.map((workplace) => ({
+      id: workplace._id,
+      name: workplace.name,
+    }));
+  },
+});
+
 export const getWagers = query({
   args: {},
   handler: async (ctx) => {
