@@ -19,9 +19,19 @@
        export VITE_CONVEX_URL=<your-convex-url>
        fly deploy --build-arg VITE_CONVEX_URL="$VITE_CONVEX_URL"
        ```
+       **zsh users:**
+       ```zsh
+       export VITE_CONVEX_URL=<your-convex-url>
+       fly deploy --build-arg VITE_CONVEX_URL="$VITE_CONVEX_URL"
+       ```
        Use your secret manager/CI secret to populate `VITE_CONVEX_URL` so it never lives in source control.
      - CI build: export it before running `npm run build`:
        ```bash
+       export VITE_CONVEX_URL=<your-convex-url>
+       npm run build
+       ```
+       **zsh users:**
+       ```zsh
        export VITE_CONVEX_URL=<your-convex-url>
        npm run build
        ```

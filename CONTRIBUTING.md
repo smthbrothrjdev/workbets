@@ -27,7 +27,8 @@ npm run dev
 ### Managing the Convex URL securely (local + CI)
 
 Use a secret manager or CI secrets to provide `VITE_CONVEX_URL` so it is not
-committed to the repo.
+committed to the repo. Prefer a dedicated local key store (1Password CLI,
+Doppler, or your OS keychain) over plaintext `.env` files.
 
 **Local development**
 1. Store the Convex deployment URL in your secret manager (1Password, Doppler,
@@ -37,19 +38,25 @@ committed to the repo.
    ```bash
    export VITE_CONVEX_URL="https://<your-deployment>.convex.cloud"
    ```
+   **zsh users:** add this to your session or `.zshrc`:
+   ```zsh
+   export VITE_CONVEX_URL="https://<your-deployment>.convex.cloud"
+   ```
 3. Run the app as usual:
    ```bash
    npm run dev
    ```
 
 **CI / production builds**
-1. Add `VITE_CONVEX_URL` as a CI secret.
-2. Export it during the build step so Vite can inline it:
+1. Add `VITE_CONVEX_URL` as a CI secret in your provider settings (e.g., GitHub
+   Actions → Repository settings → Secrets and variables → Actions → New
+   repository secret).
+2. Export it in the build step of your CI workflow so Vite can inline it:
    ```bash
    export VITE_CONVEX_URL="$VITE_CONVEX_URL"
    npm run build
    ```
-3. For Fly Docker builds, pass it as a build arg from the CI secret:
+3. For Fly Docker builds, pass it as a build arg in the deploy step:
    ```bash
    fly deploy --build-arg VITE_CONVEX_URL="$VITE_CONVEX_URL"
    ```
