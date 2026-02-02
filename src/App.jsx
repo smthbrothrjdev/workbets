@@ -12,6 +12,8 @@ const navigation = [
   { label: "Settings" },
 ];
 
+let hasSeededDemoData = false;
+
 export default function App() {
   const seedDemoData = useMutation(api.seed.seedDemoData);
   const wagers = useQuery(api.queries.getWagers) ?? [];
@@ -22,6 +24,10 @@ export default function App() {
   const featuredWager = wagers[0];
 
   useEffect(() => {
+    if (hasSeededDemoData) {
+      return;
+    }
+    hasSeededDemoData = true;
     seedDemoData();
   }, [seedDemoData]);
 

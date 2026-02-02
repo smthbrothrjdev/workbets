@@ -3,10 +3,17 @@ import { mutation } from "./_generated/server";
 export const seedDemoData = mutation({
   args: {},
   handler: async (ctx) => {
-    const existingUser = await ctx.db.query("users").first();
-    if (existingUser) {
+    const existingSeed = await ctx.db
+      .query("seedMarkers")
+      .withIndex("by_name", (q) => q.eq("name", "demo"))
+      .first();
+    if (existingSeed) {
       return { status: "skipped" };
     }
+    await ctx.db.insert("seedMarkers", {
+      name: "demo",
+      seededAt: Date.now(),
+    });
 
     const workplaceIds = new Map();
     for (const name of ["Product Studio", "Design Guild"]) {

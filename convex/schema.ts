@@ -29,6 +29,10 @@ export default defineSchema({
     sortOrder: v.number(),
     votePercent: v.optional(v.number()),
   }).index("by_wager", ["wagerId"]),
+  seedMarkers: defineTable({
+    name: v.string(),
+    seededAt: v.number(),
+  }).index("by_name", ["name"]),
   wagerTags: defineTable({
     wagerId: v.id("wagers"),
     tag: v.string(),
