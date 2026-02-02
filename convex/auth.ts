@@ -1,6 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { verifyPassword } from "./authHelpers";
+import { hashPassword, verifyPassword } from "./authHelpers";
 import { ensureDemoSeeded } from "./seedHelpers";
 
 export const authenticate = mutation({
@@ -33,6 +33,42 @@ export const authenticate = mutation({
     return {
       userId: accounts[0].userId,
     };
+  },
+});
+
+export const register = mutation({
+  args: { email: v.string(), password: v.string(), workplaceId: v.id("workplaces") },
+  handler: async (ctx, args) => {
+    const existingUser = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", args.email))
+      .first();
+    if (existingUser) {
+      throw new Error("An account with that email already exists.");
+    }
+
+    const workplace = await ctx.db.get("workplaces", args.workplaceId);
+    if (!workplace) {
+      throw new Error("Workplace not found.");
+    }
+
+    const name = args.email.split("@")[0] || "New User";
+    const userId = await ctx.db.insert("users", {
+      name,
+      email: args.email,
+      role: "User",
+      workplaceId: args.workplaceId,
+      workCred: 0,
+    });
+
+    const passwordHash = await hashPassword(args.password);
+    await ctx.db.insert("authAccounts", {
+      username: args.email,
+      passwordHash,
+      userId,
+    });
+
+    return { userId };
   },
 });
 
