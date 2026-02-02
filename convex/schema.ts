@@ -14,6 +14,13 @@ export default defineSchema({
   })
     .index("by_email", ["email"])
     .index("by_workplace", ["workplaceId"]),
+  authAccounts: defineTable({
+    username: v.string(),
+    passwordHash: v.string(),
+    userId: v.id("users"),
+  })
+    .index("by_username", ["username"])
+    .index("by_user", ["userId"]),
   wagers: defineTable({
     title: v.string(),
     description: v.string(),

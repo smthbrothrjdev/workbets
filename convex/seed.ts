@@ -1,4 +1,5 @@
 import { mutation } from "./_generated/server";
+import { hashPassword } from "./authHelpers";
 
 export const seedDemoData = mutation({
   args: {},
@@ -60,6 +61,13 @@ export const seedDemoData = mutation({
         role: user.role,
         workplaceId: workplaceIds.get(user.workplace),
         workCred: user.workCred,
+      });
+      const username = user.email.split("@")[0];
+      const passwordHash = await hashPassword("workbets123");
+      await ctx.db.insert("authAccounts", {
+        username,
+        passwordHash,
+        userId: id,
       });
       userIds.set(user.email, id);
     }
