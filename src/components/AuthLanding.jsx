@@ -34,6 +34,20 @@ export function AuthLanding({
             Sign in to keep track of active bets, team participation, and work
             cred rewards. New here? Register your workplace to join the fun.
           </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <a
+              className="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-indigo-500"
+              href="#register-workplace"
+            >
+              Register your workplace
+            </a>
+            <a
+              className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-soft transition hover:border-slate-300 hover:text-slate-900"
+              href="#sign-in"
+            >
+              Sign in
+            </a>
+          </div>
           <div className="mt-8 grid gap-4 text-sm text-slate-600 sm:grid-cols-2">
             <div className="rounded-2xl bg-white p-4 shadow-soft">
               <p className="text-xs font-semibold uppercase text-slate-400">
@@ -57,7 +71,7 @@ export function AuthLanding({
         </div>
 
         <div className="flex flex-col gap-6">
-          <div className="rounded-3xl bg-white p-8 shadow-soft">
+          <div className="rounded-3xl bg-white p-8 shadow-soft" id="sign-in">
             <div>
               <p className="text-sm font-semibold text-slate-500">
                 Welcome back
@@ -112,7 +126,10 @@ export function AuthLanding({
             </div>
           </div>
 
-          <div className="rounded-3xl bg-white p-8 shadow-soft">
+          <div
+            className="rounded-3xl bg-white p-8 shadow-soft"
+            id="register-workplace"
+          >
             <div>
               <p className="text-sm font-semibold text-slate-500">New here?</p>
               <h2 className="mt-2 text-2xl font-semibold text-slate-900">
@@ -151,21 +168,21 @@ export function AuthLanding({
                 </span>
               </label>
               <label className="block text-sm font-medium text-slate-600">
-              Workplace
-              <select
-                className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-                value={registerWorkplace}
-                onChange={(event) =>
-                  onRegisterWorkplaceChange(event.target.value)
-                }
-              >
-                {workplaces.map((workplace) => (
-                  <option key={workplace.id} value={workplace.id}>
-                    {workplace.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+                Workplace
+                <select
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  value={registerWorkplace}
+                  onChange={(event) =>
+                    onRegisterWorkplaceChange(event.target.value)
+                  }
+                >
+                  {workplaces.map((workplace) => (
+                    <option key={workplace.id} value={workplace.id}>
+                      {workplace.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
               {registerError ? (
                 <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-600">
                   {registerError}
