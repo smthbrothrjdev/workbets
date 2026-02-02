@@ -8,6 +8,17 @@ export function AuthLanding({
   onUsernameChange,
   onPasswordChange,
   onSubmit,
+  registerEmail,
+  registerPassword,
+  registerWorkspace,
+  registerError,
+  registerSuccess,
+  isRegistering,
+  workspaces,
+  onRegisterEmailChange,
+  onRegisterPasswordChange,
+  onRegisterWorkspaceChange,
+  onRegisterSubmit,
 }) {
   return (
     <main className="mx-auto flex max-w-6xl flex-col gap-10 px-6 py-16">
@@ -21,8 +32,7 @@ export function AuthLanding({
           </h1>
           <p className="mt-4 text-base text-slate-600">
             Sign in to keep track of active bets, team participation, and work
-            cred rewards. New here? We&apos;re preparing a registration flow so
-            your workplace can join the fun.
+            cred rewards. New here? Register your workspace to join the fun.
           </p>
           <div className="mt-8 grid gap-4 text-sm text-slate-600 sm:grid-cols-2">
             <div className="rounded-2xl bg-white p-4 shadow-soft">
@@ -46,65 +56,137 @@ export function AuthLanding({
           </div>
         </div>
 
-        <div className="rounded-3xl bg-white p-8 shadow-soft">
-          <div>
-            <p className="text-sm font-semibold text-slate-500">Welcome back</p>
-            <h2 className="mt-2 text-2xl font-semibold text-slate-900">
-              Sign in to Work Bets
-            </h2>
-          </div>
-          <form className="mt-6 space-y-4" onSubmit={onSubmit}>
-            <label className="block text-sm font-medium text-slate-600">
-              Username (email)
-              <input
-                className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-                placeholder="Enter your username"
-                value={username}
-                onChange={(event) => onUsernameChange(event.target.value)}
-                autoComplete="username"
-                required
-              />
-            </label>
-            <label className="block text-sm font-medium text-slate-600">
-              Password
-              <input
-                className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-                placeholder="Enter your password"
-                type="password"
-                value={password}
-                onChange={(event) => onPasswordChange(event.target.value)}
-                autoComplete="current-password"
-                required
-              />
-            </label>
-            {error ? (
-              <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-600">
-                {error}
+        <div className="flex flex-col gap-6">
+          <div className="rounded-3xl bg-white p-8 shadow-soft">
+            <div>
+              <p className="text-sm font-semibold text-slate-500">
+                Welcome back
               </p>
-            ) : null}
-            <button
-              type="submit"
-              className="flex w-full items-center justify-center rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-indigo-300"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Signing in..." : "Sign in"}
-            </button>
-          </form>
-          <div className="mt-8 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-            <p className="font-semibold text-slate-800">
-              Need an account?
+              <h2 className="mt-2 text-2xl font-semibold text-slate-900">
+                Sign in to Work Bets
+              </h2>
+            </div>
+            <form className="mt-6 space-y-4" onSubmit={onSubmit}>
+              <label className="block text-sm font-medium text-slate-600">
+                Username (email)
+                <input
+                  className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  placeholder="Enter your username"
+                  value={username}
+                  onChange={(event) => onUsernameChange(event.target.value)}
+                  autoComplete="username"
+                  required
+                />
+              </label>
+              <label className="block text-sm font-medium text-slate-600">
+                Password
+                <input
+                  className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  placeholder="Enter your password"
+                  type="password"
+                  value={password}
+                  onChange={(event) => onPasswordChange(event.target.value)}
+                  autoComplete="current-password"
+                  required
+                />
+              </label>
+              {error ? (
+                <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-600">
+                  {error}
+                </p>
+              ) : null}
+              <button
+                type="submit"
+                className="flex w-full items-center justify-center rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-indigo-300"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Signing in..." : "Sign in"}
+              </button>
+            </form>
+            <div className="mt-8 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+              <p className="font-semibold text-slate-800">Need an account?</p>
+              <p className="mt-1 text-sm text-slate-500">
+                Register with your work email and pick a workspace to get
+                started.
+              </p>
+            </div>
+          </div>
+
+          <div className="rounded-3xl bg-white p-8 shadow-soft">
+            <div>
+              <p className="text-sm font-semibold text-slate-500">New here?</p>
+              <h2 className="mt-2 text-2xl font-semibold text-slate-900">
+                Register your workspace
+              </h2>
+            </div>
+            <form className="mt-6 space-y-4" onSubmit={onRegisterSubmit}>
+              <label className="block text-sm font-medium text-slate-600">
+                Work email
+                <input
+                  className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  placeholder="you@company.com"
+                  type="email"
+                  value={registerEmail}
+                  onChange={(event) => onRegisterEmailChange(event.target.value)}
+                  autoComplete="email"
+                  required
+                />
+              </label>
+              <label className="block text-sm font-medium text-slate-600">
+                Password
+                <input
+                  className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  placeholder="Create a secure password"
+                  type="password"
+                  value={registerPassword}
+                  onChange={(event) =>
+                    onRegisterPasswordChange(event.target.value)
+                  }
+                  autoComplete="new-password"
+                  required
+                />
+                <span className="mt-2 block text-xs text-slate-400">
+                  5-24 characters, with at least three of: numbers, letters,
+                  special characters, or ASCII symbols.
+                </span>
+              </label>
+              <label className="block text-sm font-medium text-slate-600">
+                Workspace
+                <select
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  value={registerWorkspace}
+                  onChange={(event) =>
+                    onRegisterWorkspaceChange(event.target.value)
+                  }
+                >
+                  {workspaces.map((workspace) => (
+                    <option key={workspace.id} value={workspace.id}>
+                      {workspace.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {registerError ? (
+                <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-600">
+                  {registerError}
+                </p>
+              ) : null}
+              {registerSuccess ? (
+                <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                  {registerSuccess}
+                </p>
+              ) : null}
+              <button
+                type="submit"
+                className="flex w-full items-center justify-center rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-indigo-300"
+                disabled={isRegistering}
+              >
+                {isRegistering ? "Registering..." : "Register"}
+              </button>
+            </form>
+            <p className="mt-4 text-xs text-slate-400">
+              All workspaces are public while we validate access.
             </p>
-            <p className="mt-1 text-sm text-slate-500">
-              Registration is coming soon. We&apos;ll share a signup link once
-              it&apos;s ready.
-            </p>
-            <button
-              type="button"
-              className="mt-4 inline-flex items-center rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-500"
-              disabled
-            >
-              Request an invite
-            </button>
           </div>
         </div>
       </section>
@@ -120,8 +202,26 @@ AuthLanding.propTypes = {
   onUsernameChange: PropTypes.func.isRequired,
   onPasswordChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  registerEmail: PropTypes.string.isRequired,
+  registerPassword: PropTypes.string.isRequired,
+  registerWorkspace: PropTypes.string.isRequired,
+  registerError: PropTypes.string,
+  registerSuccess: PropTypes.string,
+  isRegistering: PropTypes.bool.isRequired,
+  workspaces: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  onRegisterEmailChange: PropTypes.func.isRequired,
+  onRegisterPasswordChange: PropTypes.func.isRequired,
+  onRegisterWorkspaceChange: PropTypes.func.isRequired,
+  onRegisterSubmit: PropTypes.func.isRequired,
 };
 
 AuthLanding.defaultProps = {
   error: null,
+  registerError: null,
+  registerSuccess: null,
 };
