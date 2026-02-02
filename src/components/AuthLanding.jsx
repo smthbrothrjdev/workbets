@@ -179,7 +179,7 @@ export function AuthLanding({
                 >
                   {workplaces.length === 0 ? (
                     <option value="">
-                      No workplaces yet — we'll create one for you.
+                      No workplaces yet — we&apos;ll create one for you.
                     </option>
                   ) : (
                     workplaces.map((workplace) => (
