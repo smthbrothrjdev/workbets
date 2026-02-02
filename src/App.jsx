@@ -28,9 +28,10 @@ export default function App() {
   const [password, setPassword] = useState("workbets123");
   const [authError, setAuthError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isEmailAuthToken = Boolean(authUserId?.includes("@"));
   const profile = useQuery(
     api.queries.getProfile,
-    authUserId ? { userId: authUserId } : "skip"
+    authUserId && !isEmailAuthToken ? { userId: authUserId } : "skip"
   );
   const featuredWager = wagers[0];
   const isProfileLoading = Boolean(authUserId && profile === undefined);
@@ -53,6 +54,22 @@ export default function App() {
       setAuthUserId(null);
     }
   }, [authUserId, profile]);
+
+  useEffect(() => {
+    if (!authUserId || !isEmailAuthToken || users.length === 0) {
+      return;
+    }
+
+    const matchingUser = users.find((user) => user.email === authUserId);
+    if (!matchingUser) {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+      setAuthUserId(null);
+      return;
+    }
+
+    localStorage.setItem(AUTH_STORAGE_KEY, matchingUser.id);
+    setAuthUserId(matchingUser.id);
+  }, [authUserId, isEmailAuthToken, users]);
 
   const handleSignIn = async (event) => {
     event.preventDefault();
