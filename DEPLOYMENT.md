@@ -13,11 +13,37 @@
    ```
 2. Configure the builder for static assets (example):
    - Use a Dockerfile or a buildpack that runs `npm run build` and serves `dist/`.
-3. Set environment variables for Convex (if needed):
+   - Ensure `VITE_CONVEX_URL` is available at build time (Vite inlines it into the bundle):
+     - Docker/Fly: add a build arg and environment variable (see `Dockerfile`) and pass it:
+       ```bash
+       export VITE_CONVEX_URL=<your-convex-url>
+       fly deploy --build-arg VITE_CONVEX_URL="$VITE_CONVEX_URL"
+       ```
+       **zsh users:**
+       ```zsh
+       export VITE_CONVEX_URL=<your-convex-url>
+       fly deploy --build-arg VITE_CONVEX_URL="$VITE_CONVEX_URL"
+       ```
+       Use your secret manager/CI secret to populate `VITE_CONVEX_URL` so it never lives in source control.
+     - CI build: export it before running `npm run build`:
+       ```bash
+       export VITE_CONVEX_URL=<your-convex-url>
+       npm run build
+       ```
+       **zsh users:**
+       ```zsh
+       export VITE_CONVEX_URL=<your-convex-url>
+       npm run build
+       ```
+3. (Optional) Set runtime environment variables for Convex (if needed):
    ```bash
    fly secrets set VITE_CONVEX_URL=<your-convex-url>
    ```
-4. Deploy:
+4. Verify the built assets include the Convex URL:
+   ```bash
+   rg --no-line-number "<your-convex-url>" dist/assets
+   ```
+5. Deploy:
    ```bash
    fly deploy
    ```
@@ -37,7 +63,7 @@
    ```bash
    npx convex deploy
    ```
-3. Copy the production URL and set it in Fly.io:
+3. Copy the production URL and set it in Fly.io (build-time and/or runtime as needed):
    ```bash
    fly secrets set VITE_CONVEX_URL=<production-convex-url>
    ```
