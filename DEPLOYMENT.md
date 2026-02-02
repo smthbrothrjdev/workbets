@@ -16,9 +16,10 @@
    - Ensure `VITE_CONVEX_URL` is available at build time (Vite inlines it into the bundle):
      - Docker/Fly: add a build arg and environment variable (see `Dockerfile`) and pass it:
        ```bash
-       fly deploy --build-arg VITE_CONVEX_URL=<your-convex-url>
+       export VITE_CONVEX_URL=<your-convex-url>
+       fly deploy --build-arg VITE_CONVEX_URL="$VITE_CONVEX_URL"
        ```
-       or set it in `fly.toml` under `[build.args]`.
+       Use your secret manager/CI secret to populate `VITE_CONVEX_URL` so it never lives in source control.
      - CI build: export it before running `npm run build`:
        ```bash
        export VITE_CONVEX_URL=<your-convex-url>
