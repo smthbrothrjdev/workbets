@@ -1,9 +1,9 @@
+import { useEffect } from "react";
+import { useMutation, useQuery } from "convex/react";
+import { api } from "convex/_generated/api";
 import { AdminPanel } from "./components/AdminPanel.jsx";
 import { UserProfile } from "./components/UserProfile.jsx";
 import { WagerBoard } from "./components/WagerBoard.jsx";
-import { profile } from "./data/profile.js";
-import { users } from "./data/users.js";
-import { wagers } from "./data/wagers.js";
 
 const navigation = [
   { label: "Board", active: true },
@@ -13,6 +13,18 @@ const navigation = [
 ];
 
 export default function App() {
+  const seedDemoData = useMutation(api.seed.seedDemoData);
+  const wagers = useQuery(api.queries.getWagers) ?? [];
+  const users = useQuery(api.queries.getUsers) ?? [];
+  const profile = useQuery(api.queries.getProfile, {
+    email: "riley@workbets.io",
+  });
+  const featuredWager = wagers[0];
+
+  useEffect(() => {
+    seedDemoData();
+  }, [seedDemoData]);
+
   return (
     <div className="min-h-screen bg-cloud">
       <header className="border-b border-white/60 bg-white/70 backdrop-blur">
@@ -86,7 +98,13 @@ export default function App() {
         <WagerBoard wagers={wagers} />
 
         <section className="grid gap-6 lg:grid-cols-2">
-          <UserProfile profile={profile} />
+          {profile ? (
+            <UserProfile profile={profile} />
+          ) : (
+            <section className="rounded-3xl bg-white p-6 shadow-soft">
+              <p className="text-sm text-slate-500">Loading profile...</p>
+            </section>
+          )}
           <div className="flex flex-col gap-6">
             <section className="rounded-3xl bg-white p-6 shadow-soft">
               <div className="flex items-center justify-between">
@@ -105,7 +123,7 @@ export default function App() {
                 is placed. Winners split the pooled cred.
               </p>
               <div className="mt-6 space-y-3">
-                {wagers[0].options.map((option, index) => (
+                {(featuredWager?.options ?? []).map((option, index) => (
                   <button
                     key={option}
                     type="button"
