@@ -175,12 +175,19 @@ export function AuthLanding({
                   onChange={(event) =>
                     onRegisterWorkplaceChange(event.target.value)
                   }
+                  disabled={workplaces.length === 0}
                 >
-                  {workplaces.map((workplace) => (
-                    <option key={workplace.id} value={workplace.id}>
-                      {workplace.name}
+                  {workplaces.length === 0 ? (
+                    <option value="">
+                      No workplaces yet — we&apos;ll create one for you.
                     </option>
-                  ))}
+                  ) : (
+                    workplaces.map((workplace) => (
+                      <option key={workplace.id} value={workplace.id}>
+                        {workplace.name}
+                      </option>
+                    ))
+                  )}
                 </select>
               </label>
               {registerError ? (

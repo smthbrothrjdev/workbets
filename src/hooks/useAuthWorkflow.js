@@ -68,6 +68,7 @@ const getPasswordValidation = (value) => {
 
 export function useAuthWorkflow() {
   const authenticate = useMutation(api.auth.authenticate);
+  const register = useMutation(api.auth.register);
   const users = useQuery(api.queries.getUsers);
   const workplaces = useQuery(api.queries.getWorkplaces);
   const userList = useMemo(() => users ?? [], [users]);
@@ -146,7 +147,7 @@ export function useAuthWorkflow() {
     }
   };
 
-  const handleRegister = (event) => {
+  const handleRegister = async (event) => {
     event.preventDefault();
     setRegisterError(null);
     setRegisterSuccess(null);
@@ -171,7 +172,7 @@ export function useAuthWorkflow() {
       return;
     }
 
-    if (!workplaceMatch) {
+    if (!workplaceMatch && workplaceList.length > 0) {
       setRegisterError("Choose a workplace to continue.");
       setIsRegistering(false);
       return;
@@ -183,11 +184,27 @@ export function useAuthWorkflow() {
       return;
     }
 
-    setRegisterSuccess(
-      `Registration submitted! We'll set up access for ${workplaceMatch.name}.`
-    );
-    setRegisterPassword("");
-    setIsRegistering(false);
+    try {
+      await register({
+        email: sanitizedEmail,
+        password: sanitizedValue,
+        workplaceId: workplaceMatch?.id,
+      });
+      setRegisterSuccess(
+        workplaceMatch
+          ? `Registration complete! You can now sign in with ${workplaceMatch.name}.`
+          : "Registration complete! You can now sign in."
+      );
+      setRegisterPassword("");
+    } catch (error) {
+      setRegisterError(
+        error instanceof Error
+          ? error.message
+          : "Registration failed. Please try again."
+      );
+    } finally {
+      setIsRegistering(false);
+    }
   };
 
   const handleSignOut = () => {
