@@ -24,5 +24,7 @@ jobs:
         run: npm run lint
       - name: Build
         run: npm run build
+        env:
+          VITE_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL }}
       - name: Test
         run: npm test -- --run
