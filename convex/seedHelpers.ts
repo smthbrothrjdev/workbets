@@ -4,6 +4,10 @@ import { hashPassword } from "./authHelpers";
 export const ensureDemoSeeded = async (ctx: MutationCtx) => {
   const existingAuthAccounts = await ctx.db.query("authAccounts").collect();
   const existingUsers = await ctx.db.query("users").collect();
+  if (existingAuthAccounts.length > 0 && existingUsers.length === 0) {
+    return { status: "skipped" };
+  }
+
   if (existingAuthAccounts.length > 0 && existingUsers.length > 0) {
     return { status: "skipped" };
   }
