@@ -172,7 +172,7 @@ export function useAuthWorkflow() {
       return;
     }
 
-    if (!workplaceMatch) {
+    if (!workplaceMatch && workplaceList.length > 0) {
       setRegisterError("Choose a workplace to continue.");
       setIsRegistering(false);
       return;
@@ -188,10 +188,12 @@ export function useAuthWorkflow() {
       await register({
         email: sanitizedEmail,
         password: sanitizedValue,
-        workplaceId: workplaceMatch.id,
+        workplaceId: workplaceMatch?.id,
       });
       setRegisterSuccess(
-        `Registration complete! You can now sign in with ${workplaceMatch.name}.`
+        workplaceMatch
+          ? `Registration complete! You can now sign in with ${workplaceMatch.name}.`
+          : "Registration complete! You can now sign in."
       );
       setRegisterPassword("");
     } catch (error) {
