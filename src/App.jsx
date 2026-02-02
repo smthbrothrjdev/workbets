@@ -21,7 +21,7 @@ const WORKSPACES = [
   { id: "harbor-guild", name: "Harbor Guild" },
 ];
 
-const CONTROL_CHARACTERS_REGEX = /[\x00-\x1F\x7F]/g;
+const CONTROL_CHARACTERS_REGEX = /[\u0000-\u001F\u007F]/g;
 const ASCII_REGEX = /^[\x20-\x7E]+$/;
 const DIGIT_REGEX = /[0-9]/;
 const LETTER_REGEX = /[A-Za-z]/;
@@ -34,9 +34,8 @@ const sanitizeEmail = (value) =>
 
 const getPasswordValidation = (value) => {
   const sanitizedValue = sanitizeInput(value);
-  const trimmed = sanitizedValue.trim();
 
-  if (trimmed.length < 5 || trimmed.length > 24) {
+  if (sanitizedValue.length < 5 || sanitizedValue.length > 24) {
     return {
       isValid: false,
       sanitizedValue,
@@ -44,7 +43,7 @@ const getPasswordValidation = (value) => {
     };
   }
 
-  if (!ASCII_REGEX.test(trimmed)) {
+  if (!ASCII_REGEX.test(sanitizedValue)) {
     return {
       isValid: false,
       sanitizedValue,
@@ -52,7 +51,7 @@ const getPasswordValidation = (value) => {
     };
   }
 
-  if (/\s/.test(trimmed)) {
+  if (/\s/.test(sanitizedValue)) {
     return {
       isValid: false,
       sanitizedValue,
@@ -61,10 +60,10 @@ const getPasswordValidation = (value) => {
   }
 
   const categories = [
-    DIGIT_REGEX.test(trimmed),
-    LETTER_REGEX.test(trimmed),
-    SPECIAL_CHAR_REGEX.test(trimmed),
-    ASCII_SYMBOL_REGEX.test(trimmed),
+    DIGIT_REGEX.test(sanitizedValue),
+    LETTER_REGEX.test(sanitizedValue),
+    SPECIAL_CHAR_REGEX.test(sanitizedValue),
+    ASCII_SYMBOL_REGEX.test(sanitizedValue),
   ].filter(Boolean).length;
 
   if (categories < 3) {
@@ -84,7 +83,7 @@ export default function App() {
   const authenticate = useMutation(api.auth.authenticate);
   const wagers = useQuery(api.queries.getWagers) ?? [];
   const users = useQuery(api.queries.getUsers);
-  const userList = users ?? [];
+  const userList = useMemo(() => users ?? [], [users]);
   const [authUserId, setAuthUserId] = useState(() =>
     localStorage.getItem(AUTH_STORAGE_KEY)
   );
