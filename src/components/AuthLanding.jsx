@@ -1,3 +1,4 @@
+import { useState } from "react";
 import PropTypes from "prop-types";
 
 export function AuthLanding({
@@ -20,9 +21,11 @@ export function AuthLanding({
   onRegisterWorkplaceChange,
   onRegisterSubmit,
 }) {
+  const [isRegisterOpen, setRegisterOpen] = useState(false);
+
   return (
     <main className="mx-auto flex max-w-6xl flex-col gap-10 px-6 py-16">
-      <section className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
+      <section className="grid gap-8 lg:items-start">
         <div
           className="rounded-3xl bg-gradient-to-br from-indigo-50 via-white to-sky p-10 shadow-soft"
           id="sign-in"
@@ -38,12 +41,13 @@ export function AuthLanding({
             cred rewards. New here? Register your workplace to join the fun.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <a
+            <button
               className="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-indigo-500"
-              href="#register-workplace"
+              type="button"
+              onClick={() => setRegisterOpen(true)}
             >
               Register your workplace
-            </a>
+            </button>
           </div>
           <div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
             <div>
@@ -93,14 +97,14 @@ export function AuthLanding({
               <div className="mt-6 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
                 <p className="font-semibold text-slate-800">Need an account?</p>
                 <p className="mt-1 text-sm text-slate-500">
-                  Register with your work email and pick a workplace to get
-                  started.{" "}
-                  <a
+                  <button
                     className="font-semibold text-indigo-600 hover:text-indigo-500"
-                    href="#register-workplace"
+                    type="button"
+                    onClick={() => setRegisterOpen(true)}
                   >
                     Register
-                  </a>
+                  </button>{" "}
+                  with your work email and pick a workplace to get started.
                 </p>
               </div>
             </div>
@@ -117,16 +121,24 @@ export function AuthLanding({
           </div>
         </div>
 
-        <div className="flex flex-col gap-6">
-          <div
-            className="rounded-3xl bg-white p-8 shadow-soft"
-            id="register-workplace"
-          >
-            <div>
-              <p className="text-sm font-semibold text-slate-500">New here?</p>
-              <h2 className="mt-2 text-2xl font-semibold text-slate-900">
-                Register your workplace
-              </h2>
+      </section>
+      {isRegisterOpen ? (
+        <div className="fixed inset-0 z-20 flex items-center justify-center bg-slate-900/40 p-6">
+          <div className="w-full max-w-xl rounded-3xl bg-white p-8 shadow-soft">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold text-slate-500">New here?</p>
+                <h2 className="mt-2 text-2xl font-semibold text-slate-900">
+                  Register your workplace
+                </h2>
+              </div>
+              <button
+                className="rounded-full border border-slate-200 px-3 py-1 text-sm font-semibold text-slate-500 transition hover:border-slate-300 hover:text-slate-700"
+                type="button"
+                onClick={() => setRegisterOpen(false)}
+              >
+                Close
+              </button>
             </div>
             <form className="mt-6 space-y-4" onSubmit={onRegisterSubmit}>
               <label className="block text-sm font-medium text-slate-600">
@@ -205,7 +217,7 @@ export function AuthLanding({
             </p>
           </div>
         </div>
-      </section>
+      ) : null}
     </main>
   );
 }
