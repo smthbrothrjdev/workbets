@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { AdminPanel } from "./components/AdminPanel.jsx";
+import { AuthLanding } from "./components/AuthLanding.jsx";
 import { UserProfile } from "./components/UserProfile.jsx";
 import { WagerBoard } from "./components/WagerBoard.jsx";
 
@@ -13,15 +14,30 @@ const navigation = [
 ];
 
 let hasSeededDemoData = false;
+const AUTH_STORAGE_KEY = "workbets.authUserId";
 
 export default function App() {
   const seedDemoData = useMutation(api.seed.seedDemoData);
+  const authenticate = useMutation(api.auth.authenticate);
   const wagers = useQuery(api.queries.getWagers) ?? [];
   const users = useQuery(api.queries.getUsers) ?? [];
-  const profile = useQuery(api.queries.getProfile, {
-    email: "riley@workbets.io",
-  });
+  const [authUserId, setAuthUserId] = useState(() =>
+    localStorage.getItem(AUTH_STORAGE_KEY)
+  );
+  const [username, setUsername] = useState("riley@workbets.io");
+  const [password, setPassword] = useState("workbets123");
+  const [authError, setAuthError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const profile = useQuery(
+    api.queries.getProfile,
+    authUserId ? { userId: authUserId } : "skip"
+  );
   const featuredWager = wagers[0];
+  const isProfileLoading = Boolean(authUserId && profile === undefined);
+  const isAuthenticated = useMemo(
+    () => Boolean(authUserId && profile),
+    [authUserId, profile]
+  );
 
   useEffect(() => {
     if (hasSeededDemoData) {
@@ -30,6 +46,99 @@ export default function App() {
     hasSeededDemoData = true;
     seedDemoData();
   }, [seedDemoData]);
+
+  useEffect(() => {
+    if (authUserId && profile === null) {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+      setAuthUserId(null);
+    }
+  }, [authUserId, profile]);
+
+  const handleSignIn = async (event) => {
+    event.preventDefault();
+    setAuthError(null);
+    setIsSubmitting(true);
+    try {
+      const result = await authenticate({ username, password });
+      if (!result?.userId) {
+        setAuthError("We couldn't find that account. Check your credentials.");
+        return;
+      }
+      localStorage.setItem(AUTH_STORAGE_KEY, result.userId);
+      setAuthUserId(result.userId);
+    } catch {
+      setAuthError("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSignOut = () => {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+    setAuthUserId(null);
+    setAuthError(null);
+  };
+
+  if (isProfileLoading) {
+    return (
+      <div className="min-h-screen bg-cloud">
+        <header className="border-b border-white/60 bg-white/70 backdrop-blur">
+          <div className="mx-auto flex max-w-6xl items-center gap-3 px-6 py-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-500 text-lg font-semibold text-white">
+              WB
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-slate-800">Work Bets</p>
+              <p className="text-xs text-slate-500">
+                Loading your workspace...
+              </p>
+            </div>
+          </div>
+        </header>
+        <div className="mx-auto flex max-w-6xl items-center justify-center px-6 py-24 text-sm text-slate-500">
+          Checking your credentials…
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-cloud">
+        <header className="border-b border-white/60 bg-white/70 backdrop-blur">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-500 text-lg font-semibold text-white">
+                WB
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-800">Work Bets</p>
+                <p className="text-xs text-slate-500">
+                  Friendly workplace wagers
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700"
+              disabled
+            >
+              Sign in
+            </button>
+          </div>
+        </header>
+        <AuthLanding
+          username={username}
+          password={password}
+          error={authError}
+          isSubmitting={isSubmitting}
+          onUsernameChange={setUsername}
+          onPasswordChange={setPassword}
+          onSubmit={handleSignIn}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-cloud">
@@ -62,8 +171,9 @@ export default function App() {
           <button
             type="button"
             className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700"
+            onClick={handleSignOut}
           >
-            Menu
+            Sign out
           </button>
         </div>
       </header>

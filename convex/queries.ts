@@ -60,12 +60,9 @@ export const getWagers = query({
 });
 
 export const getProfile = query({
-  args: { email: v.string() },
+  args: { userId: v.id("users") },
   handler: async (ctx, args) => {
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_email", (q) => q.eq("email", args.email))
-      .first();
+    const user = await ctx.db.get("users", args.userId);
 
     if (!user) {
       return null;
