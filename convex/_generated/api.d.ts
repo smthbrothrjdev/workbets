@@ -12,6 +12,7 @@ import type * as auth from "../auth.js";
 import type * as authHelpers from "../authHelpers.js";
 import type * as queries from "../queries.js";
 import type * as seed from "../seed.js";
+import type * as seedHelpers from "../seedHelpers.js";
 
 import type {
   ApiFromModules,
@@ -24,6 +25,7 @@ declare const fullApi: ApiFromModules<{
   authHelpers: typeof authHelpers;
   queries: typeof queries;
   seed: typeof seed;
+  seedHelpers: typeof seedHelpers;
 }>;
 
 /**
