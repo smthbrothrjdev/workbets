@@ -20,7 +20,8 @@ export default function App() {
   const seedDemoData = useMutation(api.seed.seedDemoData);
   const authenticate = useMutation(api.auth.authenticate);
   const wagers = useQuery(api.queries.getWagers) ?? [];
-  const users = useQuery(api.queries.getUsers) ?? [];
+  const users = useQuery(api.queries.getUsers);
+  const userList = users ?? [];
   const [authUserId, setAuthUserId] = useState(() =>
     localStorage.getItem(AUTH_STORAGE_KEY)
   );
@@ -56,11 +57,11 @@ export default function App() {
   }, [authUserId, profile]);
 
   useEffect(() => {
-    if (!authUserId || !isEmailAuthToken || users.length === 0) {
+    if (!authUserId || !isEmailAuthToken || users === undefined) {
       return;
     }
 
-    const matchingUser = users.find((user) => user.email === authUserId);
+    const matchingUser = userList.find((user) => user.email === authUserId);
     if (!matchingUser) {
       localStorage.removeItem(AUTH_STORAGE_KEY);
       setAuthUserId(null);
@@ -69,7 +70,7 @@ export default function App() {
 
     localStorage.setItem(AUTH_STORAGE_KEY, matchingUser.id);
     setAuthUserId(matchingUser.id);
-  }, [authUserId, isEmailAuthToken, users]);
+  }, [authUserId, isEmailAuthToken, userList, users]);
 
   const handleSignIn = async (event) => {
     event.preventDefault();
@@ -284,7 +285,7 @@ export default function App() {
                 </p>
               </div>
             </section>
-            <AdminPanel users={users} />
+            <AdminPanel users={userList} />
           </div>
         </section>
       </main>
