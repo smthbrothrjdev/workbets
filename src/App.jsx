@@ -24,7 +24,7 @@ export default function App() {
   const [authUserId, setAuthUserId] = useState(() =>
     localStorage.getItem(AUTH_STORAGE_KEY)
   );
-  const [username, setUsername] = useState("riley");
+  const [username, setUsername] = useState("riley@workbets.io");
   const [password, setPassword] = useState("workbets123");
   const [authError, setAuthError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -66,7 +66,7 @@ export default function App() {
       }
       localStorage.setItem(AUTH_STORAGE_KEY, result.userId);
       setAuthUserId(result.userId);
-    } catch (error) {
+    } catch {
       setAuthError("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);

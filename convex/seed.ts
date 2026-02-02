@@ -62,7 +62,7 @@ export const seedDemoData = mutation({
         workplaceId: workplaceIds.get(user.workplace),
         workCred: user.workCred,
       });
-      const username = user.email.split("@")[0];
+      const username = user.email;
       const passwordHash = await hashPassword("workbets123");
       await ctx.db.insert("authAccounts", {
         username,

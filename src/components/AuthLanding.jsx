@@ -38,7 +38,8 @@ export function AuthLanding({
                 Demo access
               </p>
               <p className="mt-2 font-medium text-slate-800">
-                Use <span className="font-semibold">riley</span> with{" "}
+                Use{" "}
+                <span className="font-semibold">riley@workbets.io</span> with{" "}
                 <span className="font-semibold">workbets123</span> to explore.
               </p>
             </div>
@@ -54,7 +55,7 @@ export function AuthLanding({
           </div>
           <form className="mt-6 space-y-4" onSubmit={onSubmit}>
             <label className="block text-sm font-medium text-slate-600">
-              Username
+              Username (email)
               <input
                 className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
                 placeholder="Enter your username"

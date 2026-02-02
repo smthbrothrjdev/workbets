@@ -5,22 +5,25 @@ import { verifyPassword } from "./authHelpers";
 export const authenticate = mutation({
   args: { username: v.string(), password: v.string() },
   handler: async (ctx, args) => {
-    const account = await ctx.db
+    const accounts = await ctx.db
       .query("authAccounts")
       .withIndex("by_username", (q) => q.eq("username", args.username))
-      .first();
+      .collect();
 
-    if (!account) {
+    if (accounts.length !== 1) {
       return null;
     }
 
-    const isValid = await verifyPassword(args.password, account.passwordHash);
+    const isValid = await verifyPassword(
+      args.password,
+      accounts[0].passwordHash
+    );
     if (!isValid) {
       return null;
     }
 
     return {
-      userId: account.userId,
+      userId: accounts[0].userId,
     };
   },
 });
