@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useMutation, useQuery } from "convex/react";
-import { api } from "convex/_generated/api";
+import { api } from "../convex/_generated/api";
 import { AdminPanel } from "./components/AdminPanel.jsx";
 import { UserProfile } from "./components/UserProfile.jsx";
 import { WagerBoard } from "./components/WagerBoard.jsx";
