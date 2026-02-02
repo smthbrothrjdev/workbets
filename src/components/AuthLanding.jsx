@@ -10,14 +10,14 @@ export function AuthLanding({
   onSubmit,
   registerEmail,
   registerPassword,
-  registerWorkspace,
+  registerWorkplace,
   registerError,
   registerSuccess,
   isRegistering,
-  workspaces,
+  workplaces,
   onRegisterEmailChange,
   onRegisterPasswordChange,
-  onRegisterWorkspaceChange,
+  onRegisterWorkplaceChange,
   onRegisterSubmit,
 }) {
   return (
@@ -32,7 +32,7 @@ export function AuthLanding({
           </h1>
           <p className="mt-4 text-base text-slate-600">
             Sign in to keep track of active bets, team participation, and work
-            cred rewards. New here? Register your workspace to join the fun.
+            cred rewards. New here? Register your workplace to join the fun.
           </p>
           <div className="mt-8 grid gap-4 text-sm text-slate-600 sm:grid-cols-2">
             <div className="rounded-2xl bg-white p-4 shadow-soft">
@@ -106,7 +106,7 @@ export function AuthLanding({
             <div className="mt-8 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
               <p className="font-semibold text-slate-800">Need an account?</p>
               <p className="mt-1 text-sm text-slate-500">
-                Register with your work email and pick a workspace to get
+                Register with your work email and pick a workplace to get
                 started.
               </p>
             </div>
@@ -116,7 +116,7 @@ export function AuthLanding({
             <div>
               <p className="text-sm font-semibold text-slate-500">New here?</p>
               <h2 className="mt-2 text-2xl font-semibold text-slate-900">
-                Register your workspace
+                Register your workplace
               </h2>
             </div>
             <form className="mt-6 space-y-4" onSubmit={onRegisterSubmit}>
@@ -151,21 +151,21 @@ export function AuthLanding({
                 </span>
               </label>
               <label className="block text-sm font-medium text-slate-600">
-                Workspace
-                <select
-                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-                  value={registerWorkspace}
-                  onChange={(event) =>
-                    onRegisterWorkspaceChange(event.target.value)
-                  }
-                >
-                  {workspaces.map((workspace) => (
-                    <option key={workspace.id} value={workspace.id}>
-                      {workspace.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              Workplace
+              <select
+                className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                value={registerWorkplace}
+                onChange={(event) =>
+                  onRegisterWorkplaceChange(event.target.value)
+                }
+              >
+                {workplaces.map((workplace) => (
+                  <option key={workplace.id} value={workplace.id}>
+                    {workplace.name}
+                  </option>
+                ))}
+              </select>
+            </label>
               {registerError ? (
                 <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-600">
                   {registerError}
@@ -185,7 +185,7 @@ export function AuthLanding({
               </button>
             </form>
             <p className="mt-4 text-xs text-slate-400">
-              All workspaces are public while we validate access.
+              All workplaces are public while we validate access.
             </p>
           </div>
         </div>
@@ -204,11 +204,11 @@ AuthLanding.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   registerEmail: PropTypes.string.isRequired,
   registerPassword: PropTypes.string.isRequired,
-  registerWorkspace: PropTypes.string.isRequired,
+  registerWorkplace: PropTypes.string.isRequired,
   registerError: PropTypes.string,
   registerSuccess: PropTypes.string,
   isRegistering: PropTypes.bool.isRequired,
-  workspaces: PropTypes.arrayOf(
+  workplaces: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
@@ -216,7 +216,7 @@ AuthLanding.propTypes = {
   ).isRequired,
   onRegisterEmailChange: PropTypes.func.isRequired,
   onRegisterPasswordChange: PropTypes.func.isRequired,
-  onRegisterWorkspaceChange: PropTypes.func.isRequired,
+  onRegisterWorkplaceChange: PropTypes.func.isRequired,
   onRegisterSubmit: PropTypes.func.isRequired,
 };
 
