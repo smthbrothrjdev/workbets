@@ -1,0 +1,57 @@
+import { defineSchema, defineTable } from "convex/server";
+import { v } from "convex/values";
+
+export default defineSchema({
+  workplaces: defineTable({
+    name: v.string(),
+  }).index("by_name", ["name"]),
+  users: defineTable({
+    name: v.string(),
+    email: v.string(),
+    role: v.string(),
+    workplaceId: v.id("workplaces"),
+    workCred: v.number(),
+  })
+    .index("by_email", ["email"])
+    .index("by_workplace", ["workplaceId"]),
+  wagers: defineTable({
+    title: v.string(),
+    description: v.string(),
+    status: v.string(),
+    totalCred: v.number(),
+    closesAt: v.optional(v.number()),
+    createdBy: v.optional(v.id("users")),
+    winnerOptionId: v.optional(v.id("wagerOptions")),
+  }).index("by_status", ["status"]),
+  wagerOptions: defineTable({
+    wagerId: v.id("wagers"),
+    label: v.string(),
+    sortOrder: v.number(),
+    votePercent: v.optional(v.number()),
+  }).index("by_wager", ["wagerId"]),
+  seedMarkers: defineTable({
+    name: v.string(),
+    seededAt: v.number(),
+  }).index("by_name", ["name"]),
+  wagerTags: defineTable({
+    wagerId: v.id("wagers"),
+    tag: v.string(),
+  })
+    .index("by_wager", ["wagerId"])
+    .index("by_tag", ["tag"]),
+  wagerVotes: defineTable({
+    wagerId: v.id("wagers"),
+    optionId: v.id("wagerOptions"),
+    userId: v.id("users"),
+    enhancedCred: v.optional(v.number()),
+  })
+    .index("by_wager", ["wagerId"])
+    .index("by_user", ["userId"])
+    .index("by_wager_user", ["wagerId", "userId"]),
+  pointsTransactions: defineTable({
+    userId: v.id("users"),
+    label: v.string(),
+    amount: v.number(),
+    createdAt: v.number(),
+  }).index("by_user", ["userId"]),
+});
