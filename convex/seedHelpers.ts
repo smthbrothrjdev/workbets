@@ -2,10 +2,32 @@ import type { MutationCtx } from "./_generated/server";
 import { hashPassword } from "./authHelpers";
 
 export const ensureDemoSeeded = async (ctx: MutationCtx) => {
-  const existingAuthAccount = await ctx.db.query("authAccounts").first();
-  const existingUser = await ctx.db.query("users").first();
-  if (existingAuthAccount || existingUser) {
+  const existingAuthAccounts = await ctx.db.query("authAccounts").collect();
+  const existingUsers = await ctx.db.query("users").collect();
+  if (existingAuthAccounts.length > 0 && existingUsers.length > 0) {
     return { status: "skipped" };
+  }
+
+  if (existingUsers.length > 0) {
+    const existingUsernames = new Set(
+      existingAuthAccounts.map((account) => account.username)
+    );
+    const passwordHash = await hashPassword("workbets123");
+    let createdCount = 0;
+
+    for (const user of existingUsers) {
+      if (existingUsernames.has(user.email)) {
+        continue;
+      }
+      await ctx.db.insert("authAccounts", {
+        username: user.email,
+        passwordHash,
+        userId: user._id,
+      });
+      createdCount += 1;
+    }
+
+    return { status: createdCount > 0 ? "seeded" : "skipped" };
   }
 
   const workplaceIds = new Map();
