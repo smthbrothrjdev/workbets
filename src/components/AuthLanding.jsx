@@ -39,15 +39,6 @@ export function AuthLanding({
 					<p className="mt-4 text-base text-slate-600">
 						Sign in to join the fun, make wagers, and vote in your offices pool.
 					</p>
-					<div className="mt-6 flex flex-wrap gap-3">
-						<button
-							className="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-indigo-500"
-							type="button"
-							onClick={() => setRegisterOpen(true)}
-						>
-							Register in your workplace
-						</button>
-					</div>
 					<div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
 						<div>
 							<p className="text-sm font-semibold text-slate-500">
