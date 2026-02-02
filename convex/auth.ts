@@ -1,17 +1,25 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { verifyPassword } from "./authHelpers";
+import { ensureDemoSeeded } from "./seedHelpers";
 
 export const authenticate = mutation({
   args: { username: v.string(), password: v.string() },
   handler: async (ctx, args) => {
-    const accounts = await ctx.db
+    let accounts = await ctx.db
       .query("authAccounts")
       .withIndex("by_username", (q) => q.eq("username", args.username))
       .collect();
 
     if (accounts.length !== 1) {
-      return null;
+      await ensureDemoSeeded(ctx);
+      accounts = await ctx.db
+        .query("authAccounts")
+        .withIndex("by_username", (q) => q.eq("username", args.username))
+        .collect();
+      if (accounts.length !== 1) {
+        return null;
+      }
     }
 
     const isValid = await verifyPassword(
