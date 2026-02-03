@@ -1,5 +1,26 @@
-import { useState } from "react";
-import PropTypes from "prop-types";
+import { useState, type FormEvent } from "react";
+import type { Workplace } from "../types";
+
+type AuthLandingProps = {
+	username: string;
+	password: string;
+	error: string | null;
+	isSubmitting: boolean;
+	onUsernameChange: (value: string) => void;
+	onPasswordChange: (value: string) => void;
+	onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+	registerEmail: string;
+	registerPassword: string;
+	registerWorkplace: string;
+	registerError: string | null;
+	registerSuccess: string | null;
+	isRegistering: boolean;
+	workplaces: Workplace[];
+	onRegisterEmailChange: (value: string) => void;
+	onRegisterPasswordChange: (value: string) => void;
+	onRegisterWorkplaceChange: (value: string) => void;
+	onRegisterSubmit: (event: FormEvent<HTMLFormElement>) => void;
+};
 
 export function AuthLanding({
 	username,
@@ -20,7 +41,7 @@ export function AuthLanding({
 	onRegisterPasswordChange,
 	onRegisterWorkplaceChange,
 	onRegisterSubmit,
-}) {
+}: AuthLandingProps) {
 	const [isRegisterOpen, setRegisterOpen] = useState(false);
 
 	return (
@@ -201,35 +222,3 @@ export function AuthLanding({
 		</main>
 	);
 }
-
-AuthLanding.propTypes = {
-	username: PropTypes.string.isRequired,
-	password: PropTypes.string.isRequired,
-	error: PropTypes.string,
-	isSubmitting: PropTypes.bool.isRequired,
-	onUsernameChange: PropTypes.func.isRequired,
-	onPasswordChange: PropTypes.func.isRequired,
-	onSubmit: PropTypes.func.isRequired,
-	registerEmail: PropTypes.string.isRequired,
-	registerPassword: PropTypes.string.isRequired,
-	registerWorkplace: PropTypes.string.isRequired,
-	registerError: PropTypes.string,
-	registerSuccess: PropTypes.string,
-	isRegistering: PropTypes.bool.isRequired,
-	workplaces: PropTypes.arrayOf(
-		PropTypes.shape({
-			id: PropTypes.string.isRequired,
-			name: PropTypes.string.isRequired,
-		})
-	).isRequired,
-	onRegisterEmailChange: PropTypes.func.isRequired,
-	onRegisterPasswordChange: PropTypes.func.isRequired,
-	onRegisterWorkplaceChange: PropTypes.func.isRequired,
-	onRegisterSubmit: PropTypes.func.isRequired,
-};
-
-AuthLanding.defaultProps = {
-	error: null,
-	registerError: null,
-	registerSuccess: null,
-};

@@ -1,6 +1,10 @@
-import PropTypes from "prop-types";
+import type { User } from "../types";
 
-export function AdminPanel({ users }) {
+type AdminPanelProps = {
+  users: User[];
+};
+
+export function AdminPanel({ users }: AdminPanelProps) {
   return (
     <section className="space-y-6 rounded-3xl bg-white p-6 shadow-soft">
       <div>
@@ -64,15 +68,3 @@ export function AdminPanel({ users }) {
     </section>
   );
 }
-
-AdminPanel.propTypes = {
-  users: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      email: PropTypes.string.isRequired,
-      role: PropTypes.string.isRequired,
-      workplace: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-};

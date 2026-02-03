@@ -1,13 +1,21 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { AdminPanel } from "./components/AdminPanel.jsx";
-import { AuthLanding } from "./components/AuthLanding.jsx";
-import { useAuthWorkflow } from "./hooks/useAuthWorkflow.js";
-import { UserProfile } from "./components/UserProfile.jsx";
-import { WagerBoard } from "./components/WagerBoard.jsx";
+import { AdminPanel } from "./components/AdminPanel";
+import { AuthLanding } from "./components/AuthLanding";
+import { UserProfile } from "./components/UserProfile";
+import { WagerBoard } from "./components/WagerBoard";
+import { useAuthWorkflow } from "./hooks/useAuthWorkflow";
+import type { Wager } from "./types";
 
-const navigation = [
+type NavKey = "board" | "profile" | "admin" | "settings";
+
+type NavItem = {
+  key: NavKey;
+  label: string;
+};
+
+const navigation: NavItem[] = [
   { key: "board", label: "Board" },
   { key: "profile", label: "Profile" },
   { key: "admin", label: "Admin" },
@@ -18,9 +26,9 @@ let hasSeededDemoData = false;
 
 export default function App() {
   const seedDemoData = useMutation(api.seed.seedDemoData);
-  const wagers = useQuery(api.queries.getWagers) ?? [];
+  const wagers = (useQuery(api.queries.getWagers) ?? []) as Wager[];
   const featuredWager = wagers[0];
-  const [activeTab, setActiveTab] = useState("board");
+  const [activeTab, setActiveTab] = useState<NavKey>("board");
   const {
     userList,
     profile,

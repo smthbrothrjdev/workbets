@@ -1,6 +1,4 @@
-import PropTypes from "prop-types";
-
-const tagStyles = {
+const tagStyles: Record<string, string> = {
   Open: "bg-mint text-emerald-900",
   Closed: "bg-slate-200 text-slate-700",
   Trending: "bg-lavender text-indigo-900",
@@ -9,7 +7,11 @@ const tagStyles = {
   Completed: "bg-slate-200 text-slate-700",
 };
 
-export function Tag({ label }) {
+type TagProps = {
+  label: string;
+};
+
+export function Tag({ label }: TagProps) {
   const classes = tagStyles[label] ?? "bg-slate-100 text-slate-700";
   return (
     <span className={`rounded-full px-3 py-1 text-xs font-semibold ${classes}`}>
@@ -17,7 +19,3 @@ export function Tag({ label }) {
     </span>
   );
 }
-
-Tag.propTypes = {
-  label: PropTypes.string.isRequired,
-};
