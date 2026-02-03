@@ -109,7 +109,7 @@ export function AuthLanding({
 							<div>
 								<p className="text-sm font-semibold text-slate-500">New here?</p>
 								<h2 className="mt-2 text-2xl font-semibold text-slate-900">
-									Register your workplace
+									Register in your workplace
 								</h2>
 							</div>
 							<button
