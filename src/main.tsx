@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
-import App from "./App.jsx";
+import App from "./App";
 import "./index.css";
 
 const convexUrl = import.meta.env.VITE_CONVEX_URL;
@@ -13,7 +13,12 @@ if (!convexUrl) {
 
 const convex = new ConvexReactClient(convexUrl);
 
-const root = createRoot(document.getElementById("root"));
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  throw new Error("Root element not found.");
+}
+
+const root = createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <ConvexProvider client={convex}>

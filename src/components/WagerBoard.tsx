@@ -1,7 +1,11 @@
-import PropTypes from "prop-types";
-import { WagerCard } from "./WagerCard.jsx";
+import type { Wager } from "../types";
+import { WagerCard } from "./WagerCard";
 
-export function WagerBoard({ wagers }) {
+type WagerBoardProps = {
+  wagers: Wager[];
+};
+
+export function WagerBoard({ wagers }: WagerBoardProps) {
   return (
     <section className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -28,7 +32,3 @@ export function WagerBoard({ wagers }) {
     </section>
   );
 }
-
-WagerBoard.propTypes = {
-  wagers: PropTypes.arrayOf(PropTypes.object).isRequired,
-};

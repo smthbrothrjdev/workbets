@@ -1,7 +1,11 @@
-import PropTypes from "prop-types";
-import { Tag } from "./Tag.jsx";
+import type { Wager } from "../types";
+import { Tag } from "./Tag";
 
-export function WagerCard({ wager }) {
+type WagerCardProps = {
+  wager: Wager;
+};
+
+export function WagerCard({ wager }: WagerCardProps) {
   return (
     <article className="flex h-full flex-col justify-between rounded-3xl bg-white p-6 shadow-soft">
       <div className="space-y-4">
@@ -58,20 +62,3 @@ export function WagerCard({ wager }) {
     </article>
   );
 }
-
-WagerCard.propTypes = {
-  wager: PropTypes.shape({
-    status: PropTypes.string.isRequired,
-    tags: PropTypes.arrayOf(PropTypes.string).isRequired,
-    title: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    votes: PropTypes.arrayOf(
-      PropTypes.shape({
-        option: PropTypes.string.isRequired,
-        percent: PropTypes.number.isRequired,
-      })
-    ).isRequired,
-    totalCred: PropTypes.number.isRequired,
-    winner: PropTypes.string,
-  }).isRequired,
-};

@@ -1,6 +1,10 @@
-import PropTypes from "prop-types";
+import type { UserProfileData } from "../types";
 
-export function UserProfile({ profile }) {
+type UserProfileProps = {
+  profile: UserProfileData;
+};
+
+export function UserProfile({ profile }: UserProfileProps) {
   return (
     <section className="space-y-6 rounded-3xl bg-white p-6 shadow-soft">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -63,27 +67,3 @@ export function UserProfile({ profile }) {
     </section>
   );
 }
-
-UserProfile.propTypes = {
-  profile: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    role: PropTypes.string.isRequired,
-    workCred: PropTypes.number.isRequired,
-    workplace: PropTypes.string.isRequired,
-    votingHistory: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        title: PropTypes.string.isRequired,
-        choice: PropTypes.string.isRequired,
-        enhanced: PropTypes.number.isRequired,
-      })
-    ).isRequired,
-    pointsHistory: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        label: PropTypes.string.isRequired,
-        amount: PropTypes.number.isRequired,
-      })
-    ).isRequired,
-  }).isRequired,
-};

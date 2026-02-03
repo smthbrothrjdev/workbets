@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import type { User, UserProfileData, Workplace } from "../types";
 
 const AUTH_STORAGE_KEY = "workbets.authUserId";
 const ASCII_REGEX = /^[\x20-\x7E]+$/;
@@ -9,7 +10,7 @@ const LETTER_REGEX = /[A-Za-z]/;
 const SPECIAL_CHAR_REGEX = /[!@#$%^&*()]/;
 const ASCII_SYMBOL_REGEX = /[\\[\]{};:'",.<>/?`~|\\\-_=+]/;
 
-const sanitizeInput = (value) =>
+const sanitizeInput = (value: unknown) =>
   String(value ?? "")
     .split("")
     .filter((char) => {
@@ -17,10 +18,10 @@ const sanitizeInput = (value) =>
       return code >= 32 && code !== 127;
     })
     .join("");
-const sanitizeEmail = (value) =>
+const sanitizeEmail = (value: unknown) =>
   sanitizeInput(value).replace(/\s+/g, "").toLowerCase();
 
-const getPasswordValidation = (value) => {
+const getPasswordValidation = (value: string) => {
   const sanitizedValue = sanitizeInput(value);
 
   if (sanitizedValue.length < 5 || sanitizedValue.length > 24) {
@@ -69,28 +70,30 @@ const getPasswordValidation = (value) => {
 export function useAuthWorkflow() {
   const authenticate = useMutation(api.auth.authenticate);
   const register = useMutation(api.auth.register);
-  const users = useQuery(api.queries.getUsers);
-  const workplaces = useQuery(api.queries.getWorkplaces);
+  const users = useQuery(api.queries.getUsers) as User[] | undefined;
+  const workplaces = useQuery(
+    api.queries.getWorkplaces
+  ) as Workplace[] | undefined;
   const userList = useMemo(() => users ?? [], [users]);
   const workplaceList = useMemo(() => workplaces ?? [], [workplaces]);
-  const [authUserId, setAuthUserId] = useState(() =>
+  const [authUserId, setAuthUserId] = useState<string | null>(() =>
     localStorage.getItem(AUTH_STORAGE_KEY)
   );
   const [username, setUsername] = useState("riley@workbets.io");
   const [password, setPassword] = useState("workbets123");
-  const [authError, setAuthError] = useState(null);
+  const [authError, setAuthError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
   const [registerWorkplace, setRegisterWorkplace] = useState("");
-  const [registerError, setRegisterError] = useState(null);
-  const [registerSuccess, setRegisterSuccess] = useState(null);
+  const [registerError, setRegisterError] = useState<string | null>(null);
+  const [registerSuccess, setRegisterSuccess] = useState<string | null>(null);
   const [isRegistering, setIsRegistering] = useState(false);
   const isEmailAuthToken = Boolean(authUserId?.includes("@"));
   const profile = useQuery(
     api.queries.getProfile,
     authUserId && !isEmailAuthToken ? { userId: authUserId } : "skip"
-  );
+  ) as UserProfileData | null | undefined;
   const isProfileLoading = Boolean(authUserId && profile === undefined);
   const isAuthenticated = useMemo(
     () => Boolean(authUserId && profile),
@@ -128,7 +131,7 @@ export function useAuthWorkflow() {
     setRegisterWorkplace(workplaceList[0].id);
   }, [registerWorkplace, workplaceList]);
 
-  const handleSignIn = async (event) => {
+  const handleSignIn = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setAuthError(null);
     setIsSubmitting(true);
@@ -147,7 +150,7 @@ export function useAuthWorkflow() {
     }
   };
 
-  const handleRegister = async (event) => {
+  const handleRegister = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setRegisterError(null);
     setRegisterSuccess(null);
@@ -235,10 +238,11 @@ export function useAuthWorkflow() {
     handleRegister,
     handleUsernameChange: setUsername,
     handlePasswordChange: setPassword,
-    handleRegisterEmailChange: (value) => setRegisterEmail(sanitizeEmail(value)),
-    handleRegisterPasswordChange: (value) =>
+    handleRegisterEmailChange: (value: string) =>
+      setRegisterEmail(sanitizeEmail(value)),
+    handleRegisterPasswordChange: (value: string) =>
       setRegisterPassword(sanitizeInput(value)),
-    handleRegisterWorkplaceChange: (value) =>
+    handleRegisterWorkplaceChange: (value: string) =>
       setRegisterWorkplace(sanitizeInput(value)),
   };
 }
