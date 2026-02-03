@@ -3,17 +3,11 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { AdminPanel } from "./components/AdminPanel";
 import { AuthLanding } from "./components/AuthLanding";
+import { MenuBar, type NavItem, type NavKey } from "./components/MenuBar";
 import { UserProfile } from "./components/UserProfile";
 import { WagerBoard } from "./components/WagerBoard";
 import { useAuthWorkflow } from "./hooks/useAuthWorkflow";
 import type { Wager } from "./types";
-
-type NavKey = "board" | "profile" | "admin" | "settings";
-
-type NavItem = {
-  key: NavKey;
-  label: string;
-};
 
 const navigation: NavItem[] = [
   { key: "board", label: "Board" },
@@ -66,19 +60,7 @@ export default function App() {
   if (isProfileLoading) {
     return (
       <div className="min-h-screen bg-cloud">
-        <header className="border-b border-white/60 bg-white/70 backdrop-blur">
-          <div className="mx-auto flex max-w-6xl items-center gap-3 px-6 py-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-500 text-lg font-semibold text-white">
-              WB
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-slate-800">Work Bets</p>
-              <p className="text-xs text-slate-500">
-                Loading your workplace...
-              </p>
-            </div>
-          </div>
-        </header>
+        <MenuBar subtitle="Loading your workplace..." />
         <div className="mx-auto flex max-w-6xl items-center justify-center px-6 py-24 text-sm text-slate-500">
           Checking your credentials…
         </div>
@@ -89,28 +71,10 @@ export default function App() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-cloud">
-        <header className="border-b border-white/60 bg-white/70 backdrop-blur">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-500 text-lg font-semibold text-white">
-                WB
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-800">Work Bets</p>
-                <p className="text-xs text-slate-500">
-                  Friendly workplace wagers
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700"
-              disabled
-            >
-              Sign in
-            </button>
-          </div>
-        </header>
+        <MenuBar
+          subtitle="Friendly workplace wagers"
+          action={{ label: "Sign in", disabled: true, variant: "ghost" }}
+        />
         <AuthLanding
           username={username}
           password={password}
@@ -137,44 +101,18 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-cloud">
-      <header className="border-b border-white/60 bg-white/70 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-500 text-lg font-semibold text-white">
-              WB
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-slate-800">Work Bets</p>
-              <p className="text-xs text-slate-500">
-                Friendly workplace wagers
-              </p>
-            </div>
-          </div>
-          <nav className="flex items-center gap-2 overflow-x-auto text-xs font-semibold text-slate-600 sm:text-sm md:gap-6">
-            {navigation.map((item) => (
-              <button
-                key={item.key}
-                type="button"
-                onClick={() => setActiveTab(item.key)}
-                className={`whitespace-nowrap rounded-full px-3 py-1.5 transition ${
-                  activeTab === item.key
-                    ? "bg-slate-900 text-white"
-                    : "bg-transparent text-slate-500 hover:text-slate-900"
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </nav>
-          <button
-            type="button"
-            className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700"
-            onClick={handleSignOut}
-          >
-            Sign out
-          </button>
-        </div>
-      </header>
+      <MenuBar
+        subtitle="Friendly workplace wagers"
+        navigation={navigation}
+        activeTab={activeTab}
+        onNavChange={setActiveTab}
+        action={{
+          label: "Sign out",
+          onClick: handleSignOut,
+          variant: "ghost",
+          includeInMobileMenu: true,
+        }}
+      />
 
       <main className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-8 sm:gap-10 sm:py-10">
         {activeTab === "board" && (
