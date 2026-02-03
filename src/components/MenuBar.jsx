@@ -1,4 +1,5 @@
 import { useState } from "react";
+import faviconUrl from "../public/favicon.png";
 
 export function MenuBar({
   subtitle,
@@ -21,7 +22,7 @@ export function MenuBar({
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-500">
             <img
-              src="/favicon.png"
+              src={faviconUrl}
               alt="Work Bets icon"
               className="h-6 w-6"
             />
