@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 export function MenuBar({
   subtitle,
   action,
@@ -6,6 +8,12 @@ export function MenuBar({
   onTabChange,
 }) {
   const hasNavigation = navigation.length > 0;
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleTabClick = (key) => {
+    onTabChange?.(key);
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <header className="border-b border-white/60 bg-white/70 backdrop-blur">
@@ -32,7 +40,7 @@ export function MenuBar({
                     <button
                       key={item.key}
                       type="button"
-                      onClick={() => onTabChange?.(item.key)}
+                      onClick={() => handleTabClick(item.key)}
                       className={`whitespace-nowrap rounded-full px-3 py-1.5 transition ${
                         activeTab === item.key
                           ? "bg-slate-900 text-white"
@@ -46,7 +54,12 @@ export function MenuBar({
                 <button
                   type="button"
                   className="inline-flex items-center justify-center rounded-2xl border border-slate-200 p-2 text-slate-600 sm:hidden"
-                  aria-label="Open menu"
+                  aria-label="Toggle menu"
+                  aria-expanded={isMobileMenuOpen}
+                  aria-controls="mobile-menu"
+                  onClick={() =>
+                    setIsMobileMenuOpen((previous) => !previous)
+                  }
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -69,6 +82,29 @@ export function MenuBar({
           </div>
         )}
       </div>
+      {hasNavigation && isMobileMenuOpen && (
+        <div className="border-t border-white/60 bg-white/80 px-6 py-4 sm:hidden">
+          <nav
+            id="mobile-menu"
+            className="flex flex-col gap-2 text-sm font-semibold text-slate-600"
+          >
+            {navigation.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => handleTabClick(item.key)}
+                className={`rounded-xl px-3 py-2 text-left transition ${
+                  activeTab === item.key
+                    ? "bg-slate-900 text-white"
+                    : "bg-transparent text-slate-500 hover:text-slate-900"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
