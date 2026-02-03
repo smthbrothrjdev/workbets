@@ -123,7 +123,7 @@ export function MenuBar({
                 {action?.includeInMobileMenu && (
                   <button
                     type="button"
-                    className="mt-2 rounded-2xl bg-slate-900 px-3 py-2 text-left text-sm font-semibold text-white"
+                    className="mt-2 rounded-2xl border border-slate-200 bg-slate-100 px-3 py-2 text-left text-sm font-semibold text-slate-700"
                     onClick={() => {
                       action.onClick?.();
                       setIsMobileMenuOpen(false);
