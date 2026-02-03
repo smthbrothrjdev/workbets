@@ -49,11 +49,11 @@ export function MenuBar({
     <header className="border-b border-white/60 bg-white/70 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-500/10 p-2">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-500/10 p-1">
             <img
               src={favicon}
               alt="Work Bets"
-              className="h-6 w-6 object-contain"
+              className="h-8 w-8 object-contain"
             />
           </div>
           <div>
