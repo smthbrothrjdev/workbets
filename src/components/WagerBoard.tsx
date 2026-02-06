@@ -31,7 +31,12 @@ export function WagerBoard({
         <button
           type="button"
           className="rounded-2xl bg-indigo-500 px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-indigo-400"
-          onClick={() => setIsCreateOpen(true)}
+          onClick={() => {
+            if (!currentUserId) {
+              return;
+            }
+            setIsCreateOpen(true);
+          }}
         >
           + Create wager
         </button>
@@ -46,7 +51,7 @@ export function WagerBoard({
           />
         ))}
       </div>
-      {isCreateOpen ? (
+      {isCreateOpen && currentUserId ? (
         <CreateWagerModal
           createdBy={currentUserId}
           onClose={() => setIsCreateOpen(false)}

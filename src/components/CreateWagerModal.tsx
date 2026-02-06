@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
 type CreateWagerModalProps = {
-  createdBy?: string | null;
+  createdBy: string;
   onClose: () => void;
 };
 
@@ -186,9 +186,12 @@ export function CreateWagerModal({
         </div>
         <form
           className="max-h-[70vh] space-y-5 overflow-y-auto px-6 py-6"
-          onSubmit={async (event) => {
+            onSubmit={async (event) => {
             event.preventDefault();
             if (isSubmitting) {
+              return;
+            }
+            if (!createdBy) {
               return;
             }
             if (!isOptionsReady) {
@@ -212,7 +215,7 @@ export function CreateWagerModal({
                 closesAt,
                 options: cleanedOptions,
                 tags: selectedTags.length ? selectedTags : undefined,
-                createdBy: createdBy ?? undefined,
+                createdBy,
               });
               resetForm();
               onClose();

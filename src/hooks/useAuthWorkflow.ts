@@ -70,15 +70,23 @@ const getPasswordValidation = (value: string) => {
 export function useAuthWorkflow() {
   const authenticate = useMutation(api.auth.authenticate);
   const register = useMutation(api.auth.register);
-  const users = useQuery(api.queries.getUsers) as User[] | undefined;
+  const [authUserId, setAuthUserId] = useState<string | null>(() =>
+    localStorage.getItem(AUTH_STORAGE_KEY)
+  );
+  const isEmailAuthToken = Boolean(authUserId?.includes("@"));
+  const users = useQuery(
+    api.queries.getUsers,
+    authUserId && !isEmailAuthToken ? { userId: authUserId } : "skip"
+  ) as User[] | undefined;
+  const userByEmail = useQuery(
+    api.queries.getUserByEmail,
+    authUserId && isEmailAuthToken ? { email: authUserId } : "skip"
+  ) as { id: string; email: string } | null | undefined;
   const workplaces = useQuery(
     api.queries.getWorkplaces
   ) as Workplace[] | undefined;
   const userList = useMemo(() => users ?? [], [users]);
   const workplaceList = useMemo(() => workplaces ?? [], [workplaces]);
-  const [authUserId, setAuthUserId] = useState<string | null>(() =>
-    localStorage.getItem(AUTH_STORAGE_KEY)
-  );
   const [username, setUsername] = useState("riley@workbets.io");
   const [password, setPassword] = useState("workbets123");
   const [authError, setAuthError] = useState<string | null>(null);
@@ -89,7 +97,6 @@ export function useAuthWorkflow() {
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [registerSuccess, setRegisterSuccess] = useState<string | null>(null);
   const [isRegistering, setIsRegistering] = useState(false);
-  const isEmailAuthToken = Boolean(authUserId?.includes("@"));
   const profile = useQuery(
     api.queries.getProfile,
     authUserId && !isEmailAuthToken ? { userId: authUserId } : "skip"
@@ -108,20 +115,19 @@ export function useAuthWorkflow() {
   }, [authUserId, profile]);
 
   useEffect(() => {
-    if (!authUserId || !isEmailAuthToken || users === undefined) {
+    if (!authUserId || !isEmailAuthToken || userByEmail === undefined) {
       return;
     }
 
-    const matchingUser = userList.find((user) => user.email === authUserId);
-    if (!matchingUser) {
+    if (!userByEmail) {
       localStorage.removeItem(AUTH_STORAGE_KEY);
       setAuthUserId(null);
       return;
     }
 
-    localStorage.setItem(AUTH_STORAGE_KEY, matchingUser.id);
-    setAuthUserId(matchingUser.id);
-  }, [authUserId, isEmailAuthToken, userList, users]);
+    localStorage.setItem(AUTH_STORAGE_KEY, userByEmail.id);
+    setAuthUserId(userByEmail.id);
+  }, [authUserId, isEmailAuthToken, userByEmail]);
 
   useEffect(() => {
     if (registerWorkplace || workplaceList.length === 0) {
