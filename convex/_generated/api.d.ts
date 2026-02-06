@@ -13,6 +13,7 @@ import type * as authHelpers from "../authHelpers.js";
 import type * as queries from "../queries.js";
 import type * as seed from "../seed.js";
 import type * as seedHelpers from "../seedHelpers.js";
+import type * as wagers from "../wagers.js";
 
 import type {
   ApiFromModules,
@@ -26,6 +27,7 @@ declare const fullApi: ApiFromModules<{
   queries: typeof queries;
   seed: typeof seed;
   seedHelpers: typeof seedHelpers;
+  wagers: typeof wagers;
 }>;
 
 /**
