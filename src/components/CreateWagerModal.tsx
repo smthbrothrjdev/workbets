@@ -12,6 +12,7 @@ export function CreateWagerModal({ onClose }: CreateWagerModalProps) {
   const [description, setDescription] = useState("");
   const [stakeInput, setStakeInput] = useState("");
   const [closeDate, setCloseDate] = useState("");
+  const [tagsInput, setTagsInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const createWager = useMutation(api.wagers.createWager);
   const resetForm = () => {
@@ -19,6 +20,7 @@ export function CreateWagerModal({ onClose }: CreateWagerModalProps) {
     setDescription("");
     setStakeInput("");
     setCloseDate("");
+    setTagsInput("");
   };
 
   return (
@@ -58,14 +60,24 @@ export function CreateWagerModal({ onClose }: CreateWagerModalProps) {
             setIsSubmitting(true);
             const parsedStake = Number.parseFloat(stakeInput || "0");
             const closesAt = closeDate
-              ? new Date(`${closeDate}T00:00:00Z`).getTime()
+              ? (() => {
+                  const [year, month, day] = closeDate
+                    .split("-")
+                    .map((value) => Number(value));
+                  return new Date(year, month - 1, day).getTime();
+                })()
               : undefined;
+            const tags = tagsInput
+              .split(",")
+              .map((tag) => tag.trim())
+              .filter(Boolean);
             try {
               await createWager({
                 title: title.trim(),
                 description: description.trim(),
                 totalCred: Number.isNaN(parsedStake) ? 0 : parsedStake,
                 closesAt,
+                tags: tags.length ? tags : undefined,
               });
               resetForm();
               onClose();
@@ -118,6 +130,16 @@ export function CreateWagerModal({ onClose }: CreateWagerModalProps) {
               />
             </label>
           </div>
+          <label className="block text-sm font-semibold text-slate-700">
+            Tags
+            <input
+              type="text"
+              placeholder="e.g. Launch, Release, Q1"
+              className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 shadow-soft focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              value={tagsInput}
+              onChange={(event) => setTagsInput(event.target.value)}
+            />
+          </label>
           <div className="rounded-2xl bg-slate-50 px-4 py-3 text-xs text-slate-500">
             This wager will be open to everyone in your workplace.
           </div>

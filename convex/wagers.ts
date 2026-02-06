@@ -7,6 +7,7 @@ export const createWager = mutation({
     description: v.string(),
     totalCred: v.number(),
     closesAt: v.optional(v.number()),
+    tags: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const wagerId = await ctx.db.insert("wagers", {
@@ -16,6 +17,12 @@ export const createWager = mutation({
       totalCred: args.totalCred,
       closesAt: args.closesAt,
     });
+
+    if (args.tags?.length) {
+      await Promise.all(
+        args.tags.map((tag) => ctx.db.insert("wagerTags", { wagerId, tag }))
+      );
+    }
 
     return wagerId;
   },
