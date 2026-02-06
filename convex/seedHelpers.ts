@@ -4,19 +4,50 @@ import { hashPassword } from "./authHelpers";
 export const ensureDemoSeeded = async (ctx: MutationCtx) => {
   const existingAuthAccounts = await ctx.db.query("authAccounts").collect();
   const existingUsers = await ctx.db.query("users").collect();
-  if (existingAuthAccounts.length > 0 && existingUsers.length === 0) {
-    return { status: "skipped" };
-  }
+  const passwordHash = await hashPassword("workbets123");
+  const ensureAdminDemoUser = async () => {
+    const adminEmail = "admin@workbets.io";
+    const adminUser = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", adminEmail))
+      .first();
+    let adminUserId = adminUser?._id ?? null;
 
-  if (existingAuthAccounts.length > 0 && existingUsers.length > 0) {
-    return { status: "skipped" };
-  }
+    if (!adminUserId) {
+      const workplaces = await ctx.db.query("workplaces").collect();
+      const workplaceId =
+        workplaces.length > 0
+          ? workplaces[0]._id
+          : await ctx.db.insert("workplaces", { name: "Workbets HQ" });
+      adminUserId = await ctx.db.insert("users", {
+        name: "Admin Test",
+        email: adminEmail,
+        role: "admin",
+        workplaceId,
+        workCred: 210,
+      });
+    }
+
+    const adminAccount = await ctx.db
+      .query("authAccounts")
+      .withIndex("by_username", (q) => q.eq("username", adminEmail))
+      .first();
+    if (!adminAccount && adminUserId) {
+      await ctx.db.insert("authAccounts", {
+        username: adminEmail,
+        passwordHash,
+        userId: adminUserId,
+      });
+      return true;
+    }
+
+    return !adminUser;
+  };
 
   if (existingUsers.length > 0) {
     const existingUsernames = new Set(
       existingAuthAccounts.map((account) => account.username)
     );
-    const passwordHash = await hashPassword("workbets123");
     let createdCount = 0;
 
     for (const user of existingUsers) {
@@ -31,7 +62,10 @@ export const ensureDemoSeeded = async (ctx: MutationCtx) => {
       createdCount += 1;
     }
 
-    return { status: createdCount > 0 ? "seeded" : "skipped" };
+    const adminSeeded = await ensureAdminDemoUser();
+    return {
+      status: createdCount > 0 || adminSeeded ? "seeded" : "skipped",
+    };
   }
 
   const workplaceIds = new Map();
