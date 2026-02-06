@@ -49,7 +49,7 @@ export const ensureDemoSeeded = async (ctx: MutationCtx) => {
     { label: "Closed", isSelectable: false },
     { label: "Trending", isSelectable: true },
     { label: "Low risk", isSelectable: true },
-    { label: "Completed", isSelectable: true },
+    { label: "Completed", isSelectable: false },
   ];
   const existingTagOptions = await ctx.db.query("tagOptions").collect();
   if (existingTagOptions.length === 0) {

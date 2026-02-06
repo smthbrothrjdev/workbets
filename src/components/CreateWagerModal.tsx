@@ -269,10 +269,11 @@ export function CreateWagerModal({
             </label>
           </div>
           <div className="space-y-3">
-            <label className="block text-sm font-semibold text-slate-700">
-              Tags
+            <div className="block text-sm font-semibold text-slate-700">
+              <label htmlFor="tag-search">Tags</label>
               <div className="relative mt-2">
                 <input
+                  id="tag-search"
                   type="text"
                   placeholder="Search tags"
                   className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 shadow-soft focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
@@ -333,7 +334,7 @@ export function CreateWagerModal({
                   </div>
                 ) : null}
               </div>
-            </label>
+            </div>
             {selectedTags.length ? (
               <div className="flex flex-wrap gap-2">
                 {selectedTags.map((tag) => (
