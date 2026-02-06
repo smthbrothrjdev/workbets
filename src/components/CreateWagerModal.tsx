@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 
 import { api } from "../../convex/_generated/api";
 
@@ -12,15 +12,16 @@ export function CreateWagerModal({ onClose }: CreateWagerModalProps) {
   const [description, setDescription] = useState("");
   const [stakeInput, setStakeInput] = useState("");
   const [closeDate, setCloseDate] = useState("");
-  const [tagsInput, setTagsInput] = useState("");
+  const [selectedTag, setSelectedTag] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const createWager = useMutation(api.wagers.createWager);
+  const tagOptions = useQuery(api.queries.getTagOptions) ?? [];
   const resetForm = () => {
     setTitle("");
     setDescription("");
     setStakeInput("");
     setCloseDate("");
-    setTagsInput("");
+    setSelectedTag("");
   };
 
   return (
@@ -67,17 +68,14 @@ export function CreateWagerModal({ onClose }: CreateWagerModalProps) {
                   return new Date(year, month - 1, day).getTime();
                 })()
               : undefined;
-            const tags = tagsInput
-              .split(",")
-              .map((tag) => tag.trim())
-              .filter(Boolean);
+            const tags = selectedTag ? [selectedTag] : undefined;
             try {
               await createWager({
                 title: title.trim(),
                 description: description.trim(),
                 totalCred: Number.isNaN(parsedStake) ? 0 : parsedStake,
                 closesAt,
-                tags: tags.length ? tags : undefined,
+                tags,
               });
               resetForm();
               onClose();
@@ -131,14 +129,20 @@ export function CreateWagerModal({ onClose }: CreateWagerModalProps) {
             </label>
           </div>
           <label className="block text-sm font-semibold text-slate-700">
-            Tags
-            <input
-              type="text"
-              placeholder="e.g. Launch, Release, Q1"
-              className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 shadow-soft focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-              value={tagsInput}
-              onChange={(event) => setTagsInput(event.target.value)}
-            />
+            Tag
+            <select
+              className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-soft focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              value={selectedTag}
+              onChange={(event) => setSelectedTag(event.target.value)}
+              disabled={tagOptions.length === 0}
+            >
+              <option value="">Select a tag</option>
+              {tagOptions.map((tag) => (
+                <option key={tag.id} value={tag.label}>
+                  {tag.label}
+                </option>
+              ))}
+            </select>
           </label>
           <div className="rounded-2xl bg-slate-50 px-4 py-3 text-xs text-slate-500">
             This wager will be open to everyone in your workplace.

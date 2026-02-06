@@ -44,6 +44,21 @@ export const ensureDemoSeeded = async (ctx: MutationCtx) => {
     return !adminUser;
   };
 
+  const tagOptions = [
+    "Open",
+    "Closed",
+    "Trending",
+    "Low risk",
+    "Popular pick",
+    "Completed",
+  ];
+  const existingTagOptions = await ctx.db.query("tagOptions").collect();
+  if (existingTagOptions.length === 0) {
+    for (const [index, label] of tagOptions.entries()) {
+      await ctx.db.insert("tagOptions", { label, sortOrder: index });
+    }
+  }
+
   if (existingUsers.length > 0) {
     const existingUsernames = new Set(
       existingAuthAccounts.map((account) => account.username)
