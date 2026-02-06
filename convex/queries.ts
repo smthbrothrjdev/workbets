@@ -63,7 +63,12 @@ export const getTagOptions = query({
   handler: async (ctx) => {
     const tagOptions = await ctx.db.query("tagOptions").collect();
     tagOptions.sort((a, b) => a.sortOrder - b.sortOrder);
-    const systemTags = new Set(["open", "closed"]);
+    const systemTags = new Set([
+      "open",
+      "closed",
+      "cancelled",
+      "completed",
+    ]);
 
     return tagOptions
       .filter((tag) => !systemTags.has(tag.label.toLowerCase()))
@@ -105,6 +110,12 @@ export const getWagers = query({
         .query("wagerTags")
         .withIndex("by_wager", (q) => q.eq("wagerId", wager._id))
         .collect();
+      const statusTags = new Set([
+        "open",
+        "closed",
+        "cancelled",
+        "completed",
+      ]);
 
       const winnerOption = options.find(
         (option) => option._id === wager.winnerOptionId
@@ -117,7 +128,9 @@ export const getWagers = query({
         createdBy: wager.createdBy ?? null,
         options: options.map((option) => option.label),
         status: wager.status,
-        tags: tags.map((tag) => tag.tag),
+        tags: tags
+          .map((tag) => tag.tag)
+          .filter((tag) => !statusTags.has(tag.toLowerCase())),
         totalCred: wager.totalCred,
         votes: options.map((option) => ({
           optionId: option._id,

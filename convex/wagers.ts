@@ -1,4 +1,5 @@
 import { mutation } from "./_generated/server";
+import type { MutationCtx } from "./_generated/server";
 import { v } from "convex/values";
 
 export const createWager = mutation({
@@ -12,6 +13,7 @@ export const createWager = mutation({
     createdBy: v.id("users"),
   },
   handler: async (ctx, args) => {
+    const statusTags = new Set(["open", "closed", "cancelled", "completed"]);
     const creator = await ctx.db.get("users", args.createdBy);
     if (!creator) {
       throw new Error("Creator not found.");
@@ -57,7 +59,7 @@ export const createWager = mutation({
       const tagOptionMap = new Map<string, string>();
       await Promise.all(
         normalizedTags.map(async (tag) => {
-          if (tag.toLowerCase() === openTag.toLowerCase()) {
+          if (statusTags.has(tag.toLowerCase())) {
             return;
           }
           const option = await ctx.db
@@ -83,6 +85,24 @@ export const createWager = mutation({
     return wagerId;
   },
 });
+
+const replaceStatusTags = async (
+  ctx: MutationCtx,
+  wagerId: string,
+  nextStatusTag: string
+) => {
+  const statusTags = new Set(["open", "closed", "cancelled", "completed"]);
+  const existingTags = await ctx.db
+    .query("wagerTags")
+    .withIndex("by_wager", (q) => q.eq("wagerId", wagerId))
+    .collect();
+  const statusTagEntries = existingTags.filter((tag) =>
+    statusTags.has(tag.tag.toLowerCase())
+  );
+
+  await Promise.all(statusTagEntries.map((tag) => ctx.db.delete(tag._id)));
+  await ctx.db.insert("wagerTags", { wagerId, tag: nextStatusTag });
+};
 
 const assertCanManageWager = async (
   ctx: { db: { get: (table: string, id: string) => Promise<any> } },
@@ -146,6 +166,7 @@ export const closeWager = mutation({
       status: "Closed",
       winnerOptionId: args.winnerOptionId,
     });
+    await replaceStatusTags(ctx, wager._id, "Closed");
 
     return { status: "closed" };
   },
@@ -170,6 +191,7 @@ export const cancelWager = mutation({
     await ctx.db.patch(wager._id, {
       status: "Cancelled",
     });
+    await replaceStatusTags(ctx, wager._id, "Cancelled");
 
     return { status: "cancelled" };
   },
