@@ -34,6 +34,7 @@ export type UserProfileData = {
 };
 
 export type WagerVote = {
+  optionId: string;
   option: string;
   percent: number;
 };
@@ -47,5 +48,7 @@ export type Wager = {
   votes: WagerVote[];
   totalCred: number;
   winner?: string | null;
+  winnerOptionId?: string | null;
   options?: string[];
+  createdBy?: string | null;
 };

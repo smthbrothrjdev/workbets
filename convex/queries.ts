@@ -71,15 +71,18 @@ export const getWagers = query({
         id: wager._id,
         title: wager.title,
         description: wager.description,
+        createdBy: wager.createdBy ?? null,
         options: options.map((option) => option.label),
         status: wager.status,
         tags: tags.map((tag) => tag.tag),
         totalCred: wager.totalCred,
         votes: options.map((option) => ({
+          optionId: option._id,
           option: option.label,
           percent: option.votePercent ?? 0,
         })),
         winner: winnerOption?.label,
+        winnerOptionId: wager.winnerOptionId ?? null,
       });
     }
 
