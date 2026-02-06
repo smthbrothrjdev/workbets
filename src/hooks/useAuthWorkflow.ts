@@ -70,6 +70,10 @@ const getPasswordValidation = (value: string) => {
 export function useAuthWorkflow() {
   const authenticate = useMutation(api.auth.authenticate);
   const register = useMutation(api.auth.register);
+  const [authUserId, setAuthUserId] = useState<string | null>(() =>
+    localStorage.getItem(AUTH_STORAGE_KEY)
+  );
+  const isEmailAuthToken = Boolean(authUserId?.includes("@"));
   const users = useQuery(
     api.queries.getUsers,
     authUserId && !isEmailAuthToken ? { userId: authUserId } : "skip"
@@ -83,9 +87,6 @@ export function useAuthWorkflow() {
   ) as Workplace[] | undefined;
   const userList = useMemo(() => users ?? [], [users]);
   const workplaceList = useMemo(() => workplaces ?? [], [workplaces]);
-  const [authUserId, setAuthUserId] = useState<string | null>(() =>
-    localStorage.getItem(AUTH_STORAGE_KEY)
-  );
   const [username, setUsername] = useState("riley@workbets.io");
   const [password, setPassword] = useState("workbets123");
   const [authError, setAuthError] = useState<string | null>(null);
@@ -96,7 +97,6 @@ export function useAuthWorkflow() {
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [registerSuccess, setRegisterSuccess] = useState<string | null>(null);
   const [isRegistering, setIsRegistering] = useState(false);
-  const isEmailAuthToken = Boolean(authUserId?.includes("@"));
   const profile = useQuery(
     api.queries.getProfile,
     authUserId && !isEmailAuthToken ? { userId: authUserId } : "skip"
