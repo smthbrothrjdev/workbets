@@ -7,9 +7,20 @@ export const createWager = mutation({
     description: v.string(),
     totalCred: v.number(),
     closesAt: v.optional(v.number()),
+    options: v.array(v.string()),
     tags: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
+    const normalizedOptions = Array.from(
+      new Set(
+        args.options
+          .map((option) => option.trim())
+          .filter((option) => option.length > 0)
+      )
+    );
+    if (normalizedOptions.length === 0) {
+      throw new Error("At least one wager option is required.");
+    }
     const normalizedTags = Array.from(
       new Set(
         (args.tags ?? []).map((tag) => tag.trim()).filter((tag) => tag.length > 0)
@@ -22,6 +33,17 @@ export const createWager = mutation({
       totalCred: args.totalCred,
       closesAt: args.closesAt,
     });
+
+    await Promise.all(
+      normalizedOptions.map((label, index) =>
+        ctx.db.insert("wagerOptions", {
+          wagerId,
+          label,
+          sortOrder: index,
+          votePercent: 0,
+        })
+      )
+    );
 
     if (normalizedTags.length) {
       const tagOptionMap = new Map<string, string>();

@@ -7,6 +7,120 @@ type CreateWagerModalProps = {
   onClose: () => void;
 };
 
+type OptionsModalProps = {
+  options: string[];
+  onSave: (options: string[]) => void;
+  onClose: () => void;
+};
+
+function OptionsModal({ options, onSave, onClose }: OptionsModalProps) {
+  const [draftOptions, setDraftOptions] = useState<string[]>(
+    options.length > 0 ? options : [""]
+  );
+
+  const updateOption = (index: number, value: string) => {
+    setDraftOptions((current) => {
+      const next = [...current];
+      next[index] = value;
+      return next;
+    });
+  };
+
+  const removeOption = (index: number) => {
+    setDraftOptions((current) =>
+      current.length > 1 ? current.filter((_, i) => i !== index) : [""]
+    );
+  };
+
+  const addOption = () => {
+    setDraftOptions((current) => [...current, ""]);
+  };
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center px-4 py-6 sm:px-6">
+      <button
+        type="button"
+        aria-label="Close options"
+        className="absolute inset-0 bg-slate-900/50"
+        onClick={onClose}
+      />
+      <div className="relative w-full max-w-lg overflow-hidden rounded-3xl bg-white shadow-2xl">
+        <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-widest text-indigo-500">
+              Voting options
+            </p>
+            <h3 className="text-2xl font-semibold text-slate-900">
+              Set the options
+            </h3>
+          </div>
+          <button
+            type="button"
+            className="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:border-slate-300 hover:text-slate-700"
+            onClick={onClose}
+          >
+            <span className="sr-only">Close</span>
+            ×
+          </button>
+        </div>
+        <div className="max-h-[70vh] space-y-4 overflow-y-auto px-6 py-6">
+          {draftOptions.map((option, index) => (
+            <div key={`option-${index}`} className="flex items-start gap-3">
+              <div className="flex-1">
+                <label className="block text-xs font-semibold uppercase text-slate-400">
+                  Option {index + 1}
+                </label>
+                <input
+                  type="text"
+                  className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 shadow-soft focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  placeholder="Enter an option"
+                  value={option}
+                  onChange={(event) => updateOption(index, event.target.value)}
+                />
+              </div>
+              <button
+                type="button"
+                className="mt-6 rounded-2xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300"
+                onClick={() => removeOption(index)}
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            className="w-full rounded-2xl border border-dashed border-indigo-200 px-4 py-3 text-sm font-semibold text-indigo-600 transition hover:border-indigo-300 hover:text-indigo-500"
+            onClick={addOption}
+          >
+            + Add option
+          </button>
+        </div>
+        <div className="flex flex-col gap-3 border-t border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-slate-500">
+            Add at least one option for teammates to vote on.
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              className="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300"
+              onClick={onClose}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="rounded-2xl bg-indigo-500 px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-indigo-400"
+              onClick={() => onSave(draftOptions)}
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function CreateWagerModal({ onClose }: CreateWagerModalProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -15,6 +129,8 @@ export function CreateWagerModal({ onClose }: CreateWagerModalProps) {
   const [tagSearch, setTagSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isTagMenuOpen, setIsTagMenuOpen] = useState(false);
+  const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+  const [voteOptions, setVoteOptions] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const createWager = useMutation(api.wagers.createWager);
   const tagOptions = useQuery(api.queries.getTagOptions) ?? [];
@@ -26,7 +142,13 @@ export function CreateWagerModal({ onClose }: CreateWagerModalProps) {
     setTagSearch("");
     setSelectedTags([]);
     setIsTagMenuOpen(false);
+    setIsOptionsOpen(false);
+    setVoteOptions([]);
   };
+  const cleanedOptions = voteOptions
+    .map((option) => option.trim())
+    .filter(Boolean);
+  const isOptionsReady = cleanedOptions.length > 0;
   const filteredTagOptions = tagOptions.filter((tag) =>
     tag.label.toLowerCase().includes(tagSearch.trim().toLowerCase())
   );
@@ -65,6 +187,9 @@ export function CreateWagerModal({ onClose }: CreateWagerModalProps) {
             if (isSubmitting) {
               return;
             }
+            if (!isOptionsReady) {
+              return;
+            }
             setIsSubmitting(true);
             const parsedStake = Number.parseFloat(stakeInput || "0");
             const closesAt = closeDate
@@ -81,6 +206,7 @@ export function CreateWagerModal({ onClose }: CreateWagerModalProps) {
                 description: description.trim(),
                 totalCred: Number.isNaN(parsedStake) ? 0 : parsedStake,
                 closesAt,
+                options: cleanedOptions,
                 tags: selectedTags.length ? selectedTags : undefined,
               });
               resetForm();
@@ -223,6 +349,34 @@ export function CreateWagerModal({ onClose }: CreateWagerModalProps) {
               </p>
             )}
           </div>
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm font-semibold text-slate-700">Voting options</p>
+              <button
+                type="button"
+                className="rounded-2xl border border-indigo-200 px-4 py-2 text-xs font-semibold text-indigo-600 transition hover:border-indigo-300 hover:text-indigo-500"
+                onClick={() => setIsOptionsOpen(true)}
+              >
+                Set options
+              </button>
+            </div>
+            {cleanedOptions.length ? (
+              <ul className="space-y-2 text-sm text-slate-600">
+                {cleanedOptions.map((option) => (
+                  <li
+                    key={option}
+                    className="rounded-2xl border border-slate-200 px-4 py-2"
+                  >
+                    {option}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-xs text-rose-500">
+                Add voting options before creating the wager.
+              </p>
+            )}
+          </div>
           <div className="rounded-2xl bg-slate-50 px-4 py-3 text-xs text-slate-500">
             This wager will be open to everyone in your workplace.
           </div>
@@ -245,7 +399,7 @@ export function CreateWagerModal({ onClose }: CreateWagerModalProps) {
               <button
                 type="submit"
                 className="rounded-2xl bg-indigo-500 px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-indigo-400"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !isOptionsReady}
               >
                 {isSubmitting ? "Creating..." : "Create wager"}
               </button>
@@ -253,6 +407,16 @@ export function CreateWagerModal({ onClose }: CreateWagerModalProps) {
           </div>
         </form>
       </div>
+      {isOptionsOpen ? (
+        <OptionsModal
+          options={voteOptions}
+          onClose={() => setIsOptionsOpen(false)}
+          onSave={(options) => {
+            setVoteOptions(options);
+            setIsOptionsOpen(false);
+          }}
+        />
+      ) : null}
     </div>
   );
 }
