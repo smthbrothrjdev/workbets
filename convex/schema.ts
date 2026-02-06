@@ -29,7 +29,10 @@ export default defineSchema({
     closesAt: v.optional(v.number()),
     createdBy: v.optional(v.id("users")),
     winnerOptionId: v.optional(v.id("wagerOptions")),
-  }).index("by_status", ["status"]),
+    workplaceId: v.id("workplaces"),
+  })
+    .index("by_status", ["status"])
+    .index("by_workplace", ["workplaceId"]),
   wagerOptions: defineTable({
     wagerId: v.id("wagers"),
     label: v.string(),

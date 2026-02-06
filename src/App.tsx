@@ -20,7 +20,10 @@ let hasSeededDemoData = false;
 
 export default function App() {
 	const seedDemoData = useMutation(api.seed.seedDemoData);
-	const wagers = (useQuery(api.queries.getWagers) ?? []) as Wager[];
+	const wagers = (useQuery(
+		api.queries.getWagers,
+		authUserId ? { userId: authUserId } : "skip"
+	) ?? []) as Wager[];
 	const featuredWager = wagers[0];
 	const [activeTab, setActiveTab] = useState<NavKey>("board");
 	const {

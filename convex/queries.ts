@@ -2,19 +2,47 @@ import { query } from "./_generated/server";
 import { v } from "convex/values";
 
 export const getUsers = query({
-  args: {},
-  handler: async (ctx) => {
-    const workplaces = await ctx.db.query("workplaces").collect();
-    const workplaceMap = new Map(workplaces.map((w) => [w._id, w.name]));
-    const users = await ctx.db.query("users").collect();
+  args: { userId: v.id("users") },
+  handler: async (ctx, args) => {
+    const currentUser = await ctx.db.get("users", args.userId);
+    if (!currentUser) {
+      return [];
+    }
+    if (currentUser.role.toLowerCase() !== "admin") {
+      return [];
+    }
+
+    const workplace = await ctx.db.get("workplaces", currentUser.workplaceId);
+    const users = await ctx.db
+      .query("users")
+      .withIndex("by_workplace", (q) =>
+        q.eq("workplaceId", currentUser.workplaceId)
+      )
+      .collect();
 
     return users.map((user) => ({
       id: user._id,
       name: user.name,
       email: user.email,
       role: user.role,
-      workplace: workplaceMap.get(user.workplaceId) ?? "Unknown",
+      workplace: workplace?.name ?? "Unknown",
     }));
+  },
+});
+
+export const getUserByEmail = query({
+  args: { email: v.string() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", args.email))
+      .first();
+
+    if (!user) {
+      return null;
+    }
+
+    return { id: user._id, email: user.email };
   },
 });
 
@@ -50,9 +78,16 @@ export const getTagOptions = query({
 });
 
 export const getWagers = query({
-  args: {},
-  handler: async (ctx) => {
-    const wagers = await ctx.db.query("wagers").collect();
+  args: { userId: v.id("users") },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get("users", args.userId);
+    if (!user) {
+      return [];
+    }
+    const wagers = await ctx.db
+      .query("wagers")
+      .withIndex("by_workplace", (q) => q.eq("workplaceId", user.workplaceId))
+      .collect();
     const results = [];
 
     for (const wager of wagers) {
@@ -111,6 +146,9 @@ export const getProfile = query({
     const votingHistory = [];
     for (const vote of votes) {
       const wager = await ctx.db.get("wagers", vote.wagerId);
+      if (wager?.workplaceId !== user.workplaceId) {
+        continue;
+      }
       const option = await ctx.db.get("wagerOptions", vote.optionId);
       if (!wager || !option) {
         continue;

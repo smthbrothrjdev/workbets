@@ -9,9 +9,13 @@ export const createWager = mutation({
     closesAt: v.optional(v.number()),
     options: v.array(v.string()),
     tags: v.optional(v.array(v.string())),
-    createdBy: v.optional(v.id("users")),
+    createdBy: v.id("users"),
   },
   handler: async (ctx, args) => {
+    const creator = await ctx.db.get("users", args.createdBy);
+    if (!creator) {
+      throw new Error("Creator not found.");
+    }
     const normalizedOptions = Array.from(
       new Set(
         args.options
@@ -34,6 +38,7 @@ export const createWager = mutation({
       totalCred: args.totalCred,
       closesAt: args.closesAt,
       createdBy: args.createdBy,
+      workplaceId: creator.workplaceId,
     });
 
     await Promise.all(
@@ -98,6 +103,10 @@ const assertCanManageWager = async (
 
   const isAdmin = user.role.toLowerCase() === "admin";
   const isCreator = wager.createdBy === user._id;
+
+  if (isAdmin && wager.workplaceId !== user.workplaceId) {
+    throw new Error("You don't have permission to modify this wager.");
+  }
 
   if (!isAdmin && !isCreator) {
     throw new Error("You don't have permission to modify this wager.");
