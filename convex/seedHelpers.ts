@@ -42,9 +42,16 @@ export const ensureDemoSeeded = async (ctx: MutationCtx) => {
 
   const users = [
     {
+      name: "Admin Test",
+      email: "admin@workbets.io",
+      role: "admin",
+      workplace: "Product Studio",
+      workCred: 210,
+    },
+    {
       name: "Avery Knight",
       email: "avery@workbets.io",
-      role: "Admin",
+      role: "admin",
       workplace: "Product Studio",
       workCred: 156,
     },
