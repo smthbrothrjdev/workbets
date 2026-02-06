@@ -19,8 +19,8 @@ export const createWager = mutation({
           .filter((option) => option.length > 0)
       )
     );
-    if (normalizedOptions.length === 0) {
-      throw new Error("At least one wager option is required.");
+    if (normalizedOptions.length < 2) {
+      throw new Error("At least two wager options are required.");
     }
     const normalizedTags = Array.from(
       new Set(
@@ -47,10 +47,14 @@ export const createWager = mutation({
       )
     );
 
+    const openTag = "Open";
     if (normalizedTags.length) {
       const tagOptionMap = new Map<string, string>();
       await Promise.all(
         normalizedTags.map(async (tag) => {
+          if (tag.toLowerCase() === openTag.toLowerCase()) {
+            return;
+          }
           const option = await ctx.db
             .query("tagOptions")
             .withIndex("by_label", (q) => q.eq("label", tag))
@@ -61,11 +65,14 @@ export const createWager = mutation({
         })
       );
       const validTags = Array.from(tagOptionMap.values());
-      if (validTags.length) {
-        await Promise.all(
-          validTags.map((tag) => ctx.db.insert("wagerTags", { wagerId, tag }))
-        );
-      }
+      const tagsToInsert = Array.from(
+        new Set([openTag, ...validTags.map((tag) => tag.trim())])
+      );
+      await Promise.all(
+        tagsToInsert.map((tag) => ctx.db.insert("wagerTags", { wagerId, tag }))
+      );
+    } else {
+      await ctx.db.insert("wagerTags", { wagerId, tag: openTag });
     }
 
     return wagerId;
@@ -148,7 +155,6 @@ export const cancelWager = mutation({
 
     await ctx.db.patch(wager._id, {
       status: "Cancelled",
-      winnerOptionId: undefined,
     });
 
     return { status: "cancelled" };
