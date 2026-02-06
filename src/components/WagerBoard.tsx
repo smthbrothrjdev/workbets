@@ -6,9 +6,15 @@ import { WagerCard } from "./WagerCard";
 
 type WagerBoardProps = {
   wagers: Wager[];
+  currentUserId?: string | null;
+  isAdmin?: boolean;
 };
 
-export function WagerBoard({ wagers }: WagerBoardProps) {
+export function WagerBoard({
+  wagers,
+  currentUserId,
+  isAdmin = false,
+}: WagerBoardProps) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   return (
@@ -32,11 +38,19 @@ export function WagerBoard({ wagers }: WagerBoardProps) {
       </div>
       <div className="grid gap-6 lg:grid-cols-3">
         {wagers.map((wager) => (
-          <WagerCard key={wager.id} wager={wager} />
+          <WagerCard
+            key={wager.id}
+            wager={wager}
+            currentUserId={currentUserId}
+            isAdmin={isAdmin}
+          />
         ))}
       </div>
       {isCreateOpen ? (
-        <CreateWagerModal onClose={() => setIsCreateOpen(false)} />
+        <CreateWagerModal
+          createdBy={currentUserId}
+          onClose={() => setIsCreateOpen(false)}
+        />
       ) : null}
     </section>
   );

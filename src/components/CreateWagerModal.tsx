@@ -4,6 +4,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
 type CreateWagerModalProps = {
+  createdBy?: string | null;
   onClose: () => void;
 };
 
@@ -97,7 +98,7 @@ function OptionsModal({ options, onSave, onClose }: OptionsModalProps) {
         </div>
         <div className="flex flex-col gap-3 border-t border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-slate-500">
-            Add at least one option for teammates to vote on.
+            Add at least two options for teammates to vote on.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <button
@@ -121,7 +122,10 @@ function OptionsModal({ options, onSave, onClose }: OptionsModalProps) {
   );
 }
 
-export function CreateWagerModal({ onClose }: CreateWagerModalProps) {
+export function CreateWagerModal({
+  createdBy,
+  onClose,
+}: CreateWagerModalProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [stakeInput, setStakeInput] = useState("");
@@ -148,7 +152,7 @@ export function CreateWagerModal({ onClose }: CreateWagerModalProps) {
   const cleanedOptions = voteOptions
     .map((option) => option.trim())
     .filter(Boolean);
-  const isOptionsReady = cleanedOptions.length > 0;
+  const isOptionsReady = cleanedOptions.length > 1;
   const filteredTagOptions = tagOptions.filter((tag) =>
     tag.label.toLowerCase().includes(tagSearch.trim().toLowerCase())
   );
@@ -208,6 +212,7 @@ export function CreateWagerModal({ onClose }: CreateWagerModalProps) {
                 closesAt,
                 options: cleanedOptions,
                 tags: selectedTags.length ? selectedTags : undefined,
+                createdBy: createdBy ?? undefined,
               });
               resetForm();
               onClose();

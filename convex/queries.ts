@@ -35,12 +35,15 @@ export const getTagOptions = query({
   handler: async (ctx) => {
     const tagOptions = await ctx.db.query("tagOptions").collect();
     tagOptions.sort((a, b) => a.sortOrder - b.sortOrder);
+    const systemTags = new Set(["open", "closed"]);
 
-    return tagOptions.map((tag) => ({
-      id: tag._id,
-      label: tag.label,
-      isSelectable: tag.isSelectable ?? true,
-    }))
+    return tagOptions
+      .filter((tag) => !systemTags.has(tag.label.toLowerCase()))
+      .map((tag) => ({
+        id: tag._id,
+        label: tag.label,
+        isSelectable: tag.isSelectable ?? true,
+      }))
       .filter((tag) => tag.isSelectable)
       .map(({ id, label }) => ({ id, label }));
   },
@@ -71,15 +74,18 @@ export const getWagers = query({
         id: wager._id,
         title: wager.title,
         description: wager.description,
+        createdBy: wager.createdBy ?? null,
         options: options.map((option) => option.label),
         status: wager.status,
         tags: tags.map((tag) => tag.tag),
         totalCred: wager.totalCred,
         votes: options.map((option) => ({
+          optionId: option._id,
           option: option.label,
           percent: option.votePercent ?? 0,
         })),
         winner: winnerOption?.label,
+        winnerOptionId: wager.winnerOptionId ?? null,
       });
     }
 

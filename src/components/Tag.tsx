@@ -1,6 +1,7 @@
 const tagStyles: Record<string, string> = {
   Open: "bg-mint text-emerald-900",
   Closed: "bg-slate-200 text-slate-700",
+  Cancelled: "bg-slate-200 text-slate-700",
   Trending: "bg-lavender text-indigo-900",
   "Low risk": "bg-sky text-sky-900",
   Completed: "bg-slate-200 text-slate-700",

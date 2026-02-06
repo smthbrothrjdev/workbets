@@ -39,6 +39,7 @@ export default function App() {
 		registerSuccess,
 		isRegistering,
 		workplaces,
+		authUserId,
 		handleSignIn,
 		handleSignOut,
 		handleRegister,
@@ -158,7 +159,11 @@ export default function App() {
 								</div>
 							</div>
 						</section>
-						<WagerBoard wagers={wagers} />
+						<WagerBoard
+							wagers={wagers}
+							currentUserId={authUserId}
+							isAdmin={isAdmin}
+						/>
 					</>
 				)}
 
