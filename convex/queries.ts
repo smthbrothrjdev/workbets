@@ -39,7 +39,10 @@ export const getTagOptions = query({
     return tagOptions.map((tag) => ({
       id: tag._id,
       label: tag.label,
-    }));
+      isSelectable: tag.isSelectable ?? true,
+    }))
+      .filter((tag) => tag.isSelectable)
+      .map(({ id, label }) => ({ id, label }));
   },
 });
 

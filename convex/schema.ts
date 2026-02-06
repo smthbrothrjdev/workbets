@@ -39,6 +39,7 @@ export default defineSchema({
   tagOptions: defineTable({
     label: v.string(),
     sortOrder: v.number(),
+    isSelectable: v.optional(v.boolean()),
   })
     .index("by_label", ["label"])
     .index("by_sortOrder", ["sortOrder"]),

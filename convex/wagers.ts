@@ -31,7 +31,7 @@ export const createWager = mutation({
             .query("tagOptions")
             .withIndex("by_label", (q) => q.eq("label", tag))
             .first();
-          if (option) {
+          if (option && option.isSelectable !== false) {
             tagOptionMap.set(tag, option.label);
           }
         })
