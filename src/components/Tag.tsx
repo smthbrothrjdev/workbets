@@ -3,7 +3,6 @@ const tagStyles: Record<string, string> = {
   Closed: "bg-slate-200 text-slate-700",
   Trending: "bg-lavender text-indigo-900",
   "Low risk": "bg-sky text-sky-900",
-  "Popular pick": "bg-peach text-orange-900",
   Completed: "bg-slate-200 text-slate-700",
 };
 

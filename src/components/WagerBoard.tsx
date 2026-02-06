@@ -1,4 +1,7 @@
+import { useState } from "react";
+
 import type { Wager } from "../types";
+import { CreateWagerModal } from "./CreateWagerModal";
 import { WagerCard } from "./WagerCard";
 
 type WagerBoardProps = {
@@ -6,6 +9,8 @@ type WagerBoardProps = {
 };
 
 export function WagerBoard({ wagers }: WagerBoardProps) {
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+
   return (
     <section className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -20,6 +25,7 @@ export function WagerBoard({ wagers }: WagerBoardProps) {
         <button
           type="button"
           className="rounded-2xl bg-indigo-500 px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-indigo-400"
+          onClick={() => setIsCreateOpen(true)}
         >
           + Create wager
         </button>
@@ -29,6 +35,9 @@ export function WagerBoard({ wagers }: WagerBoardProps) {
           <WagerCard key={wager.id} wager={wager} />
         ))}
       </div>
+      {isCreateOpen ? (
+        <CreateWagerModal onClose={() => setIsCreateOpen(false)} />
+      ) : null}
     </section>
   );
 }

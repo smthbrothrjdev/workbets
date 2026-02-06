@@ -30,6 +30,22 @@ export const getWorkplaces = query({
   },
 });
 
+export const getTagOptions = query({
+  args: {},
+  handler: async (ctx) => {
+    const tagOptions = await ctx.db.query("tagOptions").collect();
+    tagOptions.sort((a, b) => a.sortOrder - b.sortOrder);
+
+    return tagOptions.map((tag) => ({
+      id: tag._id,
+      label: tag.label,
+      isSelectable: tag.isSelectable ?? true,
+    }))
+      .filter((tag) => tag.isSelectable)
+      .map(({ id, label }) => ({ id, label }));
+  },
+});
+
 export const getWagers = query({
   args: {},
   handler: async (ctx) => {

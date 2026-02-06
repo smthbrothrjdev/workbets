@@ -44,6 +44,18 @@ export const ensureDemoSeeded = async (ctx: MutationCtx) => {
     return !adminUser;
   };
 
+  const tagOptions = ["Open", "Closed", "Trending", "Low risk", "Completed"];
+  const existingTagOptions = await ctx.db.query("tagOptions").collect();
+  if (existingTagOptions.length === 0) {
+    for (const [index, label] of tagOptions.entries()) {
+      await ctx.db.insert("tagOptions", {
+        label,
+        sortOrder: index,
+        isSelectable: true,
+      });
+    }
+  }
+
   if (existingUsers.length > 0) {
     const existingUsernames = new Set(
       existingAuthAccounts.map((account) => account.username)
@@ -166,7 +178,7 @@ export const ensureDemoSeeded = async (ctx: MutationCtx) => {
       description: "Current queue is 23 tickets. Betting closes Wednesday.",
       status: "Open",
       totalCred: 62,
-      tags: ["Popular pick"],
+      tags: ["Trending"],
       options: [
         { label: "Clear by Friday", votePercent: 41 },
         { label: "Still >10 tickets", votePercent: 44 },
