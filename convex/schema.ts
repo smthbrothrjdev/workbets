@@ -39,7 +39,9 @@ export default defineSchema({
   tagOptions: defineTable({
     label: v.string(),
     sortOrder: v.number(),
-  }).index("by_label", ["label"]),
+  })
+    .index("by_label", ["label"])
+    .index("by_sortOrder", ["sortOrder"]),
   seedMarkers: defineTable({
     name: v.string(),
     seededAt: v.number(),
