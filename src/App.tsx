@@ -9,7 +9,7 @@ import { WagerBoard } from "./components/WagerBoard";
 import { useAuthWorkflow } from "./hooks/useAuthWorkflow";
 import type { Wager } from "./types";
 
-const navigation: NavItem[] = [
+const baseNavigation: NavItem[] = [
   { key: "board", label: "Board" },
   { key: "profile", label: "Profile" },
   { key: "admin", label: "Admin" },
@@ -48,6 +48,10 @@ export default function App() {
     handleRegisterPasswordChange,
     handleRegisterWorkplaceChange,
   } = useAuthWorkflow();
+  const isAdmin = profile?.role === "admin";
+  const navigation = baseNavigation.filter(
+    (item) => item.key !== "admin" || isAdmin
+  );
 
   useEffect(() => {
     if (hasSeededDemoData) {
@@ -56,6 +60,12 @@ export default function App() {
     hasSeededDemoData = true;
     seedDemoData();
   }, [seedDemoData]);
+
+  useEffect(() => {
+    if (!isAdmin && activeTab === "admin") {
+      setActiveTab("board");
+    }
+  }, [activeTab, isAdmin]);
 
   if (isProfileLoading) {
     return (
