@@ -9,7 +9,7 @@ export default defineSchema({
     name: v.string(),
     email: v.string(),
     role: v.string(),
-    workplaceId: v.id("workplaces"),
+    workplaceId: v.optional(v.id("workplaces")),
     workCred: v.number(),
   })
     .index("by_email", ["email"])
@@ -29,7 +29,7 @@ export default defineSchema({
     closesAt: v.optional(v.number()),
     createdBy: v.optional(v.id("users")),
     winnerOptionId: v.optional(v.id("wagerOptions")),
-    workplaceId: v.id("workplaces"),
+    workplaceId: v.optional(v.id("workplaces")),
   })
     .index("by_status", ["status"])
     .index("by_workplace", ["workplaceId"]),

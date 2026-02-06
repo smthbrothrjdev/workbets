@@ -84,13 +84,18 @@ export const getWagers = query({
     if (!user) {
       return [];
     }
-    const wagers = await ctx.db
-      .query("wagers")
-      .withIndex("by_workplace", (q) => q.eq("workplaceId", user.workplaceId))
-      .collect();
+    const wagers = await ctx.db.query("wagers").collect();
     const results = [];
 
     for (const wager of wagers) {
+      let wagerWorkplaceId = wager.workplaceId ?? null;
+      if (!wagerWorkplaceId && wager.createdBy) {
+        const creator = await ctx.db.get("users", wager.createdBy);
+        wagerWorkplaceId = creator?.workplaceId ?? null;
+      }
+      if (!wagerWorkplaceId || wagerWorkplaceId !== user.workplaceId) {
+        continue;
+      }
       const options = await ctx.db
         .query("wagerOptions")
         .withIndex("by_wager", (q) => q.eq("wagerId", wager._id))
@@ -146,11 +151,16 @@ export const getProfile = query({
     const votingHistory = [];
     for (const vote of votes) {
       const wager = await ctx.db.get("wagers", vote.wagerId);
-      if (wager?.workplaceId !== user.workplaceId) {
+      let wagerWorkplaceId = wager?.workplaceId ?? null;
+      if (!wagerWorkplaceId && wager?.createdBy) {
+        const creator = await ctx.db.get("users", wager.createdBy);
+        wagerWorkplaceId = creator?.workplaceId ?? null;
+      }
+      if (!wager || !wagerWorkplaceId || wagerWorkplaceId !== user.workplaceId) {
         continue;
       }
       const option = await ctx.db.get("wagerOptions", vote.optionId);
-      if (!wager || !option) {
+      if (!option) {
         continue;
       }
       votingHistory.push({

@@ -103,8 +103,13 @@ const assertCanManageWager = async (
 
   const isAdmin = user.role.toLowerCase() === "admin";
   const isCreator = wager.createdBy === user._id;
+  let wagerWorkplaceId = wager.workplaceId ?? null;
+  if (!wagerWorkplaceId && wager.createdBy) {
+    const creator = await ctx.db.get("users", wager.createdBy);
+    wagerWorkplaceId = creator?.workplaceId ?? null;
+  }
 
-  if (isAdmin && wager.workplaceId !== user.workplaceId) {
+  if (isAdmin && wagerWorkplaceId && wagerWorkplaceId !== user.workplaceId) {
     throw new Error("You don't have permission to modify this wager.");
   }
 
