@@ -64,6 +64,7 @@ export function AuthLanding({
 						<div>
 							<p className="text-sm font-semibold text-slate-500">
 								Demo only: Use riley@workbets.io with workbets123 to explore.
+								Admin demo: Use admin@workbets.io with workbets123 for admin access.
 							</p>
 							<h2 className="mt-2 text-2xl font-semibold text-slate-900">
 								Sign in to Work Bets
